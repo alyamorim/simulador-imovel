@@ -19,33 +19,25 @@
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-  body{
-    margin:0; background:var(--paper); color:var(--ink);
-    font-family:"Inter",system-ui,sans-serif; font-size:15px; line-height:1.5;
-    padding:24px 18px 64px;
-  }
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:"Inter",system-ui,sans-serif; font-size:15px; line-height:1.5; padding:24px 18px 64px}
   .wrap{max-width:1060px; margin:0 auto}
   .tnum{font-variant-numeric:tabular-nums}
 
   header{margin-bottom:20px}
   .eyebrow{font-family:"Space Grotesk"; font-size:12px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--fund); margin:0 0 6px}
   h1{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(28px,5vw,40px); letter-spacing:-.02em; margin:0; line-height:1.05}
-  .sub{color:var(--ink-soft); margin:8px 0 0; max-width:56ch}
+  .sub{color:var(--ink-soft); margin:8px 0 0; max-width:58ch}
 
-  .hero{background:var(--ink); color:#fff; border-radius:var(--radius); padding:24px 24px 20px; margin:22px 0; box-shadow:var(--shadow)}
-  .hero-grid{display:grid; grid-template-columns:1.15fr 1fr; gap:26px}
-  @media(max-width:640px){.hero-grid{grid-template-columns:1fr; gap:20px}}
-  .hero-label{font-size:12.5px; letter-spacing:.04em; color:#AEB8C7; margin:0 0 4px; font-weight:500}
-  .hero-num{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(30px,6vw,46px); letter-spacing:-.02em; line-height:1; color:#fff}
-  .hero-num.bank{color:#F0A65A}
-  .hero-note{font-size:12.5px; color:#9BA6B6; margin:7px 0 0}
+  .hero{background:var(--ink); color:#fff; border-radius:var(--radius); padding:26px 26px 22px; margin:22px 0; box-shadow:var(--shadow)}
+  .hero-label{font-size:13px; letter-spacing:.03em; color:#AEB8C7; margin:0 0 6px; font-weight:500}
+  .hero-num{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(46px,11vw,78px); letter-spacing:-.03em; line-height:.95; color:#fff}
+  .hero-num .per{font-size:.32em; color:#8A97AB; font-weight:500; letter-spacing:0; margin-left:6px}
+  .hero-note{font-size:13px; color:#9BA6B6; margin:10px 0 0; max-width:60ch}
   .hero-note b{color:#D7DEE8; font-weight:600}
-  .hero-divider{width:1px; background:rgba(255,255,255,.12)}
-  @media(max-width:640px){.hero-divider{display:none}}
 
-  .stack{margin-top:20px}
+  .stack{margin-top:22px}
   .stack-title{font-size:12px; color:#9BA6B6; margin:0 0 8px; letter-spacing:.03em}
-  .bar{display:flex; height:34px; border-radius:8px; overflow:hidden; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
+  .bar{display:flex; height:32px; border-radius:8px; overflow:hidden; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
   .seg{height:100%; transition:width .35s cubic-bezier(.4,0,.2,1); min-width:0}
   .seg.own{background:var(--own)} .seg.fund{background:var(--fund)} .seg.bank{background:var(--bank)}
   .legend{display:flex; flex-wrap:wrap; gap:14px 20px; margin-top:12px}
@@ -83,30 +75,34 @@
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--fund); cursor:pointer; border:3px solid #fff; box-shadow:0 1px 4px rgba(14,147,132,.5)}
   input[type=range]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--fund); cursor:pointer; border:3px solid #fff; box-shadow:0 1px 4px rgba(14,147,132,.5)}
 
+  .rate-readout{background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 13px; margin-top:12px; font-size:12px; color:var(--ink-soft); line-height:1.5}
+  .rate-readout b{font-family:"Space Grotesk"; color:var(--fund); font-weight:600}
+
   .result-line{display:flex; justify-content:space-between; align-items:baseline; padding:11px 0; border-bottom:1px solid var(--line)}
   .result-line:last-child{border-bottom:none}
   .result-line .k{font-size:13px; color:var(--ink-soft)}
   .result-line .v{font-family:"Space Grotesk"; font-weight:600; font-size:16px; text-align:right}
-  .v.fund{color:var(--fund)} .v.bank{color:var(--bank)}
+  .v.fund{color:var(--fund)} .v.bank{color:var(--bank)} .v.big{font-size:19px}
   .v small{font-family:"Inter"; font-weight:400; font-size:11.5px; color:var(--ink-faint); display:block; margin-top:1px}
 
-  .goal{background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:15px 16px; margin-bottom:16px}
-  .goal-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px}
-  .goal-top .lbl{font-size:12.5px; color:var(--ink-soft); font-weight:500}
-  .goal-top .pct{font-family:"Space Grotesk"; font-weight:700; font-size:18px}
-  .meter{height:8px; border-radius:6px; background:var(--line-strong); overflow:hidden; position:relative}
-  .meter-fill{height:100%; background:var(--good); border-radius:6px; transition:width .35s ease}
-  .meter-mark{position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink); left:100%}
-  .goal-msg{font-size:12px; margin:9px 0 0; line-height:1.45}
+  .ideal{background:linear-gradient(180deg,#0E9384,#0B7A6E); color:#fff; border-radius:var(--radius-sm); padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:14px}
+  .ideal .txt{font-size:12.5px; color:#CFF0EB; max-width:20ch; line-height:1.4}
+  .ideal .big{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(22px,5vw,30px); letter-spacing:-.01em; white-space:nowrap}
+  .ideal .big .per{font-size:.5em;color:#A9E3DB;font-weight:500}
+  .goal-msg{font-size:12px; margin:12px 2px 0; line-height:1.45; color:var(--ink-soft)}
   .goal-msg .ok{color:var(--good); font-weight:600}
-  .goal-msg .miss{color:var(--bank); font-weight:600}
 
-  .ideal{background:linear-gradient(180deg,#0E9384,#0B7A6E); color:#fff; border-radius:var(--radius-sm); padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:2px}
-  .ideal .txt{font-size:12.5px; color:#CFF0EB; max-width:22ch; line-height:1.4}
-  .ideal .big{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(22px,5vw,28px); letter-spacing:-.01em; white-space:nowrap}
-  .btn{margin-top:12px; width:100%; padding:11px; border:none; border-radius:var(--radius-sm); background:var(--ink); color:#fff; font-family:"Inter"; font-weight:600; font-size:13.5px; cursor:pointer; transition:.15s}
-  .btn:hover{background:#26314a} .btn:active{transform:translateY(1px)}
-  .btn:focus-visible{outline:2px solid var(--fund); outline-offset:2px}
+  .sens table{width:100%; border-collapse:collapse}
+  .sens th{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); font-weight:600; text-align:left; padding:0 10px 10px}
+  .sens th:last-child, .sens td:last-child{text-align:right}
+  .sens td{padding:12px 10px; border-top:1px solid var(--line); font-family:"Space Grotesk"; font-weight:500; position:relative}
+  .sens tr.cur td{background:#F0F7F5}
+  .sens tr.cur td:first-child{box-shadow:inset 3px 0 0 var(--fund)}
+  .sens .price{color:var(--ink)}
+  .sens .aporte{color:var(--fund); font-weight:600}
+  .sens .barcell{position:relative}
+  .sens .barfill{position:absolute; left:10px; bottom:6px; height:3px; background:var(--fund); opacity:.35; border-radius:2px}
+  .sens .tag{display:inline-block; font-family:"Inter"; font-size:10px; font-weight:600; color:var(--fund); background:#DCF0EC; border-radius:4px; padding:1px 6px; margin-left:7px; vertical-align:middle}
 
   .flag{font-size:11.5px; padding:9px 12px; border-radius:8px; margin-top:12px; line-height:1.45; display:none}
   .flag.show{display:block}
@@ -121,35 +117,25 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Plano de entrada · atualização mensal</p>
+    <p class="eyebrow">Meta de entrada · 1/3 do imóvel</p>
     <h1>Simulador Imóvel</h1>
-    <p class="sub">Ajuste o que você tem disponível e o quanto aporta por mês. A conta mostra quanto sobraria para financiar no banco — o número que você quer manter o menor possível.</p>
+    <p class="sub">A pergunta central: quanto preciso aportar por mês para juntar uma entrada de 1/3 do valor do imóvel na data da compra. Mexa no preço e no prazo e veja o aporte mudar.</p>
   </header>
 
   <section class="hero">
-    <div class="hero-grid">
-      <div>
-        <p class="hero-label">Financiar no banco</p>
-        <div class="hero-num bank tnum" id="heroBank">—</div>
-        <p class="hero-note" id="heroBankNote"></p>
-      </div>
-      <div class="hero-divider"></div>
-      <div>
-        <p class="hero-label">Aporte mensal ideal · meta de 1/3 de entrada</p>
-        <div class="hero-num tnum" id="heroIdeal">—</div>
-        <p class="hero-note" id="heroIdealNote"></p>
-      </div>
-    </div>
+    <p class="hero-label">Aporte mensal para dar 1/3 de entrada</p>
+    <div class="hero-num tnum"><span id="heroIdeal">—</span><span class="per">/mês</span></div>
+    <p class="hero-note" id="heroNote"></p>
 
     <div class="stack">
-      <p class="stack-title">Como o imóvel + custos são cobertos</p>
+      <p class="stack-title">Seguindo esse aporte, como o imóvel + custos ficam cobertos</p>
       <div class="bar" id="bar">
         <div class="seg own" id="segOwn"></div>
         <div class="seg fund" id="segFund"></div>
         <div class="seg bank" id="segBank"></div>
       </div>
       <div class="legend">
-        <div><span class="dot own"></span>Entrada (recursos) <b id="lgOwn">—</b></div>
+        <div><span class="dot own"></span>Entrada (1/3) <b id="lgOwn">—</b></div>
         <div><span class="dot fund"></span>Fundo <b id="lgFund">—</b></div>
         <div><span class="dot bank"></span>Banco <b id="lgBank">—</b></div>
       </div>
@@ -164,7 +150,7 @@
         <div class="field money">
           <label for="recDisp">Recursos disponíveis para a entrada</label>
           <input type="number" id="recDisp" value="185121" step="500" min="0">
-          <p class="hint">Tudo que já está reservado para o imóvel — sua renda fixa, a bolsa e os recursos da esposa, somados. Edite todo mês conforme o saldo cresce.</p>
+          <p class="hint">Tudo que já está reservado para o imóvel — renda fixa, bolsa e recursos da esposa, somados. Edite todo mês conforme cresce.</p>
         </div>
 
         <div class="field">
@@ -180,19 +166,22 @@
 
         <div class="row2">
           <div class="field">
-            <label for="rendCarteira">Rendimento da carteira</label>
-            <div style="position:relative"><input type="number" id="rendCarteira" value="10" step="0.5" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">% a.a.</span></div>
+            <label for="pctCDI">Rendimento (% do CDI)</label>
+            <div style="position:relative"><input type="number" id="pctCDI" value="100" step="1" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">%</span></div>
           </div>
           <div class="field">
-            <label for="custos">Custos de aquisição</label>
-            <div style="position:relative"><input type="number" id="custos" value="4.5" step="0.5" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">%</span></div>
-            <p class="hint">ITBI (3% em BH) + registro.</p>
+            <label for="ir">IR médio sobre o ganho</label>
+            <div style="position:relative"><input type="number" id="ir" value="17.5" step="0.5" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">%</span></div>
           </div>
         </div>
+        <div class="rate-readout">
+          Rende pela <b>Selic projetada do Focus</b> — 14% hoje, caindo a ~12% em 2027 e ~10,5% em 2028 —, mês a mês, líquida de IR. Taxa líquida média no seu prazo: <b id="rTaxaEfetiva">—</b> a.a.
+        </div>
 
-        <div class="field">
-          <div class="slider-head"><label for="aporte" style="margin:0">Aporte mensal planejado</label><span class="slider-val" id="aporteVal">R$ 1.000</span></div>
-          <input type="range" id="aporte" min="0" max="8000" step="100" value="1000">
+        <div class="field" style="margin-top:15px">
+          <label for="custos">Custos de aquisição</label>
+          <div style="position:relative"><input type="number" id="custos" value="4.5" step="0.5" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">%</span></div>
+          <p class="hint">ITBI (3% em BH) + registro.</p>
         </div>
       </div>
 
@@ -202,7 +191,7 @@
         <div class="field money">
           <label for="fundoValor">Valor pelo fundo do trabalho</label>
           <input type="number" id="fundoValor" value="300000" step="5000" min="0">
-          <p class="hint">Confira o teto e se ele é combinável com o banco no mesmo imóvel — isso muda a estrutura.</p>
+          <p class="hint">Confira o teto e se ele é combinável com o banco no mesmo imóvel.</p>
         </div>
         <div class="row3">
           <div class="field">
@@ -224,7 +213,7 @@
         <div class="field">
           <label>Valor pelo banco</label>
           <div style="padding:11px 12px;border:1px dashed var(--line-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:'Space Grotesk';font-weight:600;font-size:16px;color:var(--bank)" class="tnum" id="bancoValorBox">—</div>
-          <p class="hint">Calculado: preço + custos − entrada projetada − fundo. É o resíduo a minimizar.</p>
+          <p class="hint">Resíduo: preço + custos − entrada de 1/3 − fundo.</p>
         </div>
         <div class="row3">
           <div class="field">
@@ -251,35 +240,42 @@
 
     <div>
       <div class="card">
-        <h2>Sua entrada</h2>
-        <div class="goal">
-          <div class="goal-top"><span class="lbl">Entrada projetada vs. meta de 1/3</span><span class="pct tnum" id="goalPct">—</span></div>
-          <div class="meter"><div class="meter-fill" id="goalFill"></div><div class="meter-mark"></div></div>
-          <p class="goal-msg" id="goalMsg"></p>
-        </div>
+        <h2>A meta de 1/3</h2>
+        <div class="result-line"><span class="k">Meta de entrada (1/3 do imóvel)</span><span class="v big tnum" id="rTerco">—</span></div>
+        <div class="result-line"><span class="k">Você tem hoje</span><span class="v tnum" id="rHoje">—</span></div>
+        <div class="result-line"><span class="k">Projeção sem aportar (só rendimento)</span><span class="v tnum" id="rSemAporte">—</span></div>
+        <div class="result-line"><span class="k">A cobrir com aportes</span><span class="v tnum" id="rCobrir">—</span></div>
         <div class="ideal">
-          <div class="txt">Aporte mensal para ter 1/3 do imóvel de entrada na data da compra</div>
-          <div class="big tnum" id="idealNum">—</div>
+          <div class="txt">Aporte mensal necessário</div>
+          <div class="big tnum"><span id="idealNum">—</span><span class="per">/mês</span></div>
         </div>
-        <button class="btn" id="useIdeal">Usar esse aporte no plano</button>
+        <p class="goal-msg" id="goalMsg"></p>
       </div>
 
       <div class="card">
         <h2>Resumo do plano</h2>
         <div class="result-line"><span class="k">Preço + custos de aquisição</span><span class="v tnum" id="rTotal">—</span></div>
-        <div class="result-line"><span class="k">Entrada projetada (recursos + aportes)</span><span class="v tnum" id="rEntrada">—</span></div>
+        <div class="result-line"><span class="k">Entrada (1/3)</span><span class="v tnum" id="rEntrada">—</span></div>
         <div class="result-line"><span class="k">Financiado no fundo</span><span class="v fund tnum" id="rFundo">—<small id="rFundoParc"></small></span></div>
         <div class="result-line"><span class="k">Financiado no banco</span><span class="v bank tnum" id="rBanco">—<small id="rBancoParc"></small></span></div>
         <div class="result-line"><span class="k">1ª parcela somada (fundo + banco)</span><span class="v tnum" id="rParcTotal">—<small id="rComprometimento"></small></span></div>
         <div class="flag warn" id="flagCap"></div>
         <div class="flag info" id="flagSobra"></div>
-        <div class="caveat">Material de apoio, não recomendação de investimento. Parcelas são estimativas (taxa efetiva a.a. convertida para mensal); confirme na simulação oficial do banco e no regulamento do fundo.</div>
       </div>
     </div>
   </div>
 
+  <div class="card sens">
+    <h2>Aporte ideal por preço do imóvel</h2>
+    <table>
+      <thead><tr><th>Preço do imóvel</th><th>Entrada (1/3)</th><th>Aporte / mês</th></tr></thead>
+      <tbody id="sensBody"></tbody>
+    </table>
+    <div class="caveat">Material de apoio, não recomendação de investimento. Projeções e parcelas são estimativas: a Selic futura é a do Boletim Focus e pode mudar; a carteira tem títulos travados que não seguem exatamente a Selic. Confirme na simulação oficial do banco e no regulamento do fundo.</div>
+  </div>
+
   <footer>
-    Premissas do modelo: os recursos disponíveis rendem à taxa informada e recebem os aportes mensais até a compra. A bolsa está embutida nesse total e é tratada como renda fixa (na prática, oscila). A entrada considerada para a meta de 1/3 é só o que sai do seu bolso — fundo e banco são financiamento e não entram na entrada.
+    Como o rendimento é calculado: os recursos e cada aporte crescem mês a mês pela Selic projetada do Focus (14% em ago/2026, caindo para ~12% ao fim de 2027 e ~10,5% ao fim de 2028, interpolada entre esses pontos), ajustada pelo % do CDI e líquida do IR médio informado. Cada aporte rende do mês em que entra até a compra. A bolsa está embutida no total e é tratada como renda fixa. A entrada de 1/3 é só o que sai do seu bolso — fundo e banco são financiamento. Quando o que você já tem, rendendo, já passa de 1/3, o aporte necessário é zero.
   </footer>
 </div>
 
@@ -290,19 +286,33 @@
   const brl2 = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.max(0,v));
   const num = id => { const n = parseFloat($(id).value); return isNaN(n)?0:n; };
 
-  function fv(P0, A, n, aa){
-    const i = Math.pow(1+aa/100, 1/12) - 1;
-    if(i === 0) return P0 + A*n;
-    const g = Math.pow(1+i, n);
-    return P0*g + A*((g-1)/i);
+  // Selic path (Focus) — annual % by month offset from Aug/2026
+  const ANCHORS = [[0,14.00],[4,13.75],[16,12.00],[28,10.50]];
+  function selicAt(m){
+    if(m<=ANCHORS[0][0]) return ANCHORS[0][1];
+    for(let k=0;k<ANCHORS.length-1;k++){
+      if(m<=ANCHORS[k+1][0]){
+        const [m0,v0]=ANCHORS[k], [m1,v1]=ANCHORS[k+1];
+        return v0+(v1-v0)*(m-m0)/(m1-m0);
+      }
+    }
+    return ANCHORS[ANCHORS.length-1][1];
   }
-  function solveA(P0, target, n, aa){
-    const i = Math.pow(1+aa/100, 1/12) - 1;
-    const g = Math.pow(1+i, n);
-    const grown = P0*g;
-    if(grown >= target) return 0;
-    const factor = (i===0) ? n : (g-1)/i;
-    return (target - grown)/factor;
+  // month-by-month net monthly rates for horizon n
+  function rates(n, pctCDI, ir){
+    const im=[];
+    for(let m=1;m<=n;m++){
+      const grossA = selicAt(m) * (pctCDI/100) * (1 - ir/100);
+      im.push(Math.pow(1+grossA/100, 1/12) - 1);
+    }
+    return im;
+  }
+  // growth factors: potF (existing pot), annF (per-unit monthly aporte, end-of-month)
+  function factors(im){
+    let potF=1; for(const i of im) potF*=(1+i);
+    let annF=0;
+    for(let k=1;k<=im.length;k++){ let f=1; for(let m=k+1;m<=im.length;m++) f*=(1+im[m-1]); annF+=f; }
+    return {potF, annF};
   }
   function financing(pv, aa, n, sys){
     if(pv<=0||n<=0) return {first:0,last:0,fixed:0,total:0};
@@ -318,11 +328,11 @@
 
   function compute(){
     const recDisp   = num('recDisp');
-    const n         = num('prazoMeses');
+    const n         = Math.max(1, num('prazoMeses'));
     const preco     = num('preco');
-    const rend      = num('rendCarteira');
+    const pctCDI    = num('pctCDI');
+    const ir        = num('ir');
     const custosPct = num('custos');
-    const aporte    = num('aporte');
     const fundoVal  = num('fundoValor');
     const fundoTaxa = num('fundoTaxa');
     const fundoPz   = num('fundoPrazo');
@@ -334,17 +344,30 @@
 
     $('prazoVal').textContent = n + (n===1?' mês':' meses');
     $('precoVal').textContent = brl0(preco);
-    $('aporteVal').textContent = brl0(aporte);
 
-    const custos = preco * custosPct/100;
+    const im = rates(n, pctCDI, ir);
+    const {potF, annF} = factors(im);
+    const taxaEfetivaAA = (Math.pow(potF, 12/n) - 1)*100;
+    $('rTaxaEfetiva').textContent = taxaEfetivaAA.toFixed(1).replace('.',',') + '%';
+
+    const custos   = preco * custosPct/100;
     const totalNec = preco + custos;
+    const terco    = preco/3;
 
-    const entrada = fv(recDisp, aporte, n, rend);   // all available resources grown + contributions
+    const semAporte = recDisp * potF;
+    const idealA = semAporte >= terco ? 0 : (terco - semAporte)/annF;
+    const entrada = semAporte + idealA*annF;   // = terço if idealA>0, else grown resources
     let banco = totalNec - entrada - fundoVal;
     const sobra = banco < 0 ? -banco : 0;
     if(banco < 0) banco = 0;
 
-    // stacked bar
+    // HERO
+    $('heroIdeal').textContent = brl0(idealA);
+    $('heroNote').innerHTML = idealA > 0
+      ? `Para juntar <b>${brl0(terco)}</b> (1/3 de um imóvel de ${brl0(preco)}) em <b>${n} meses</b>, partindo dos ${brl0(recDisp)} que você já tem, a ~${taxaEfetivaAA.toFixed(1).replace('.',',')}% a.a. líquidos.`
+      : `Você já tem o suficiente: os ${brl0(recDisp)} atuais rendem até <b>${brl0(semAporte)}</b>, acima da meta de ${brl0(terco)}. Não precisa aportar mais para o 1/3.`;
+
+    // bar
     const ownShown = Math.min(entrada, totalNec);
     const fundShown = Math.min(fundoVal, Math.max(0,totalNec-ownShown));
     const bankShown = banco;
@@ -356,34 +379,20 @@
     $('lgFund').textContent = brl0(fundoVal);
     $('lgBank').textContent = brl0(banco);
 
-    $('heroBank').textContent = brl0(banco);
-    const pctFin = preco>0 ? banco/preco*100 : 0;
-    $('heroBankNote').innerHTML = banco>0
-      ? `<b>${pctFin.toFixed(0)}%</b> do valor do imóvel · em ${n} meses, aportando ${brl0(aporte)}/mês`
-      : `Entrada + fundo já cobrem tudo. Sobra <b>${brl0(sobra)}</b>.`;
-
-    const terco = preco/3;
-    const idealA = solveA(recDisp, terco, n, rend);
+    // meta card
+    $('rTerco').textContent = brl0(terco);
+    $('rHoje').textContent  = brl0(recDisp);
+    $('rSemAporte').textContent = brl0(semAporte);
+    $('rCobrir').textContent = brl0(Math.max(0, terco - semAporte));
     $('idealNum').textContent = brl0(idealA);
-    $('heroIdeal').textContent = brl0(idealA);
-    window.__idealA = Math.round(idealA/100)*100;
+    $('goalMsg').innerHTML = idealA>0
+      ? `Aportando <b>${brl0(idealA)}/mês</b>, sua entrada chega exatamente a 1/3 do imóvel na compra.`
+      : `<span class="ok">Meta já atingida.</span> Qualquer aporte extra reduz ainda mais o banco.`;
 
-    const goalPctRaw = terco>0 ? entrada/terco*100 : 0;
-    $('goalPct').textContent = goalPctRaw.toFixed(0)+'%';
-    $('goalFill').style.width = Math.min(100, goalPctRaw)+'%';
-    $('goalFill').style.background = goalPctRaw>=100 ? 'var(--good)' : 'var(--bank)';
-    const met = entrada >= terco - 0.5;
-    $('goalMsg').innerHTML = met
-      ? `<span class="ok">Meta atingida.</span> Sua entrada projetada de ${brl0(entrada)} passa de 1/3 do imóvel (${brl0(terco)}).`
-      : `Falta <span class="miss">${brl0(terco-entrada)}</span> para chegar a 1/3 (${brl0(terco)}). Com aporte de <b>${brl0(idealA)}/mês</b> você fecha a meta.`;
-    $('heroIdealNote').innerHTML = met
-      ? `Já atingida com o aporte atual — pode aportar menos.`
-      : `Hoje você projeta <b>${goalPctRaw.toFixed(0)}%</b> da meta de 1/3`;
-
+    // plano
     const fF = financing(fundoVal, fundoTaxa, fundoPz, fundoSist);
     const fB = financing(banco, bancoTaxa, bancoPz, bancoSist);
     const parc1 = fF.first + fB.first;
-
     $('rTotal').textContent   = brl0(totalNec);
     $('rEntrada').textContent = brl0(entrada);
     $('rFundo').firstChild.textContent = brl0(fundoVal);
@@ -394,37 +403,35 @@
     $('rFundoParc').textContent = fundoVal>0 ? descF : '';
     $('rBancoParc').textContent = banco>0 ? descB : '';
     $('rParcTotal').firstChild.textContent = brl2(parc1);
-
     if(renda>0){
       const comp = parc1/renda*100;
       $('rComprometimento').textContent = `${comp.toFixed(0)}% da renda (limite ~30%)`;
       $('rComprometimento').style.color = comp>30 ? 'var(--warn)' : 'var(--good)';
-    } else {
-      $('rComprometimento').textContent = '';
-    }
+    } else $('rComprometimento').textContent = '';
 
+    const pctFin = preco>0 ? banco/preco*100 : 0;
     const flagCap = $('flagCap');
-    if(pctFin > 80){
-      flagCap.classList.add('show');
-      flagCap.textContent = `Atenção: financiar ${pctFin.toFixed(0)}% ultrapassa o teto de ~80% que o banco costuma cobrir. Aumente a entrada, o fundo ou reduza o preço.`;
-    } else flagCap.classList.remove('show');
-
+    if(pctFin > 80){ flagCap.classList.add('show'); flagCap.textContent = `Atenção: financiar ${pctFin.toFixed(0)}% ultrapassa o teto de ~80% que o banco costuma cobrir. Aumente o fundo ou reduza o preço.`; }
+    else flagCap.classList.remove('show');
     const flagSobra = $('flagSobra');
-    if(sobra > 0){
-      flagSobra.classList.add('show');
-      flagSobra.textContent = `Você cobre o imóvel sem o banco e ainda sobram ${brl0(sobra)} — dá para mirar um imóvel melhor ou usar menos do fundo.`;
-    } else flagSobra.classList.remove('show');
+    if(sobra > 0){ flagSobra.classList.add('show'); flagSobra.textContent = `Com 1/3 de entrada + fundo você cobre tudo e ainda sobram ${brl0(sobra)} — dá para usar menos do fundo ou mirar um imóvel melhor.`; }
+    else flagSobra.classList.remove('show');
+
+    // sensitivity: aporte ideal por preço (preço atual ± 50k, ± 100k)
+    const pts = [...new Set([preco-100000,preco-50000,preco,preco+50000,preco+100000].filter(p=>p>=600000))].sort((a,b)=>a-b);
+    const rows = pts.map(p=>{ const t=p/3; const A = semAporte>=t?0:(t-semAporte)/annF; return {p, t, A}; });
+    const maxA = Math.max(1, ...rows.map(r=>r.A));
+    $('sensBody').innerHTML = rows.map(r=>{
+      const cur = (r.p===preco) ? ' class="cur"' : '';
+      const tag = (r.p===preco) ? '<span class="tag">atual</span>' : '';
+      const w = (r.A/maxA*100);
+      return `<tr${cur}><td class="price">${brl0(r.p)}${tag}</td><td class="tnum">${brl0(r.t)}</td><td class="barcell tnum"><span class="aporte">${brl0(r.A)}</span><span class="barfill" style="width:${w*0.55}%"></span></td></tr>`;
+    }).join('');
   }
 
-  ['recDisp','prazoMeses','preco','rendCarteira','custos','aporte',
+  ['recDisp','prazoMeses','preco','pctCDI','ir','custos',
    'fundoValor','fundoTaxa','fundoPrazo','fundoSist','bancoTaxa','bancoPrazo','bancoSist','renda']
    .forEach(id => { $(id).addEventListener('input', compute); $(id).addEventListener('change', compute); });
-
-  $('useIdeal').addEventListener('click', ()=>{
-    const a = window.__idealA || 0;
-    $('aporte').value = Math.min(8000, a);
-    compute();
-  });
 
   compute();
 })();
