@@ -1,439 +1,443 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador Imóvel</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aporte mensal para a entrada — planejador da compra</title>
 <style>
   :root{
-    --paper:#EDF0F3; --surface:#FFFFFF; --surface-2:#F6F8FA;
-    --ink:#141B2B; --ink-soft:#5A6577; --ink-faint:#8A93A2;
-    --line:#DCE1E7; --line-strong:#C6CDD6;
-    --own:#2563A8; --fund:#0E9384; --bank:#C2691C;
-    --good:#12805C; --warn:#B42318;
-    --radius:14px; --radius-sm:10px;
-    --shadow:0 1px 2px rgba(20,27,43,.05), 0 8px 24px -14px rgba(20,27,43,.18);
+    --bg:#ECEFEC; --paper:#FFFFFF; --ink:#17231F; --muted:#5C6862; --faint:#8A968F;
+    --line:#D7DED9; --line-strong:#C3CDC6;
+    --fundo:#1F7A54; --fundo-bg:#E4F0EA;
+    --proprio:#345E8C; --proprio-bg:#E3EAF3;
+    --banco:#BB5A22; --banco-bg:#F6E7DA;
+    --danger:#B0342F; --danger-bg:#F6E1DF;
+    --serif:"Charter","Bitstream Charter","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-  body{margin:0; background:var(--paper); color:var(--ink); font-family:"Inter",system-ui,sans-serif; font-size:15px; line-height:1.5; padding:24px 18px 64px}
-  .wrap{max-width:1060px; margin:0 auto}
-  .tnum{font-variant-numeric:tabular-nums}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;font-size:16px}
+  .wrap{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,40px)}
 
-  header{margin-bottom:20px}
-  .eyebrow{font-family:"Space Grotesk"; font-size:12px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--fund); margin:0 0 6px}
-  h1{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(28px,5vw,40px); letter-spacing:-.02em; margin:0; line-height:1.05}
-  .sub{color:var(--ink-soft); margin:8px 0 0; max-width:58ch}
+  header.top{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:26px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.08;margin:.35rem 0 .5rem;letter-spacing:-.01em}
+  .lede{color:var(--muted);max-width:64ch;font-size:15px}
 
-  .hero{background:var(--ink); color:#fff; border-radius:var(--radius); padding:26px 26px 22px; margin:22px 0; box-shadow:var(--shadow)}
-  .hero-label{font-size:13px; letter-spacing:.03em; color:#AEB8C7; margin:0 0 6px; font-weight:500}
-  .hero-num{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(46px,11vw,78px); letter-spacing:-.03em; line-height:.95; color:#fff}
-  .hero-num .per{font-size:.32em; color:#8A97AB; font-weight:500; letter-spacing:0; margin-left:6px}
-  .hero-note{font-size:13px; color:#9BA6B6; margin:10px 0 0; max-width:60ch}
-  .hero-note b{color:#D7DEE8; font-weight:600}
+  .grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:30px;align-items:start}
+  @media(max-width:880px){.grid{grid-template-columns:1fr;gap:22px}}
 
-  .stack{margin-top:22px}
-  .stack-title{font-size:12px; color:#9BA6B6; margin:0 0 8px; letter-spacing:.03em}
-  .bar{display:flex; height:32px; border-radius:8px; overflow:hidden; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
-  .seg{height:100%; transition:width .35s cubic-bezier(.4,0,.2,1); min-width:0}
-  .seg.own{background:var(--own)} .seg.fund{background:var(--fund)} .seg.bank{background:var(--bank)}
-  .legend{display:flex; flex-wrap:wrap; gap:14px 20px; margin-top:12px}
-  .legend div{display:flex; align-items:baseline; gap:7px; font-size:12.5px; color:#C3CBD6}
-  .dot{width:9px; height:9px; border-radius:2px; flex:none; transform:translateY(1px)}
-  .dot.own{background:var(--own)} .dot.fund{background:var(--fund)} .dot.bank{background:var(--bank)}
-  .legend b{color:#fff; font-family:"Space Grotesk"; font-weight:600}
+  fieldset{border:1px solid var(--line);border-radius:12px;padding:16px 16px 6px;margin:0 0 16px;background:var(--paper)}
+  legend{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);padding:0 8px;font-weight:600}
+  .field{margin-bottom:14px}
+  .field > label{display:block;font-size:13.5px;color:var(--ink);margin-bottom:5px;font-weight:500}
+  .hint{display:block;font-size:12px;color:var(--faint);margin-top:4px;line-height:1.35}
+  input[type=number]{width:100%;font-family:var(--mono);font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px}
+  input[type=number]:focus,input[type=range]:focus-visible,button:focus-visible,select:focus{outline:2px solid var(--proprio);outline-offset:1px}
+  input[disabled]{background:#F1F4F1;color:var(--faint)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .slider-wrap{display:flex;align-items:center;gap:12px}
+  input[type=range]{flex:1;accent-color:var(--proprio);height:22px}
+  .val-out{font-family:var(--mono);font-size:14px;min-width:104px;text-align:right;color:var(--ink)}
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+  .seg button{border:0;background:#fff;padding:8px 14px;font-family:var(--sans);font-size:13.5px;color:var(--muted);cursor:pointer}
+  .seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+  .check{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--muted);cursor:pointer}
+  .check input{margin-top:2px;accent-color:var(--proprio)}
 
-  .cols{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start}
-  @media(max-width:820px){.cols{grid-template-columns:1fr}}
+  .results{position:sticky;top:18px}
+  @media(max-width:880px){.results{position:static}}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+  .panel h2{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 14px;font-weight:600}
 
-  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px 20px 22px; box-shadow:var(--shadow); margin-bottom:18px}
-  .card h2{font-family:"Space Grotesk"; font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 16px; display:flex; align-items:center; gap:9px}
-  .card h2::before{content:""; width:16px; height:2px; background:var(--fund); border-radius:2px}
+  /* HERO — aporte mensal para 1/3 */
+  .hero{background:var(--ink);color:#EAF0EC;border:1px solid var(--ink);border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
+  .hero .cap{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:#9DB4AA}
+  .hero .amount{font-family:var(--serif);font-weight:600;font-size:clamp(40px,8vw,60px);line-height:1;letter-spacing:-.02em;margin:8px 0 2px;color:#fff;font-variant-numeric:tabular-nums}
+  .hero .per{font-size:14px;color:#9DB4AA;margin-bottom:16px}
+  .hero .sub{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid rgba(255,255,255,.14);padding-top:14px}
+  .hero .sub .k{font-size:12px;color:#9DB4AA}
+  .hero .sub .v{font-family:var(--mono);font-size:16px;font-weight:600;color:#fff;margin-top:2px}
+  .hero .status{margin-top:14px;font-size:13.5px;display:flex;align-items:center;gap:9px;color:#DCE7E1}
+  .hero .status .pill{font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:20px}
+  .pill.ok{background:#20563E;color:#8FE3BC} .pill.no{background:#5A2320;color:#F3B4AF}
 
-  .field{margin-bottom:15px}
-  .field:last-child{margin-bottom:0}
-  .field > label{display:block; font-size:13px; font-weight:500; color:var(--ink); margin-bottom:6px}
-  .hint{font-size:11.5px; color:var(--ink-faint); margin:5px 0 0; line-height:1.4}
+  .compbar{display:flex;height:28px;border-radius:7px;overflow:hidden;border:1px solid var(--line);background:#f3f5f3}
+  .compbar > i{display:block;height:100%;transition:width .45s cubic-bezier(.2,.7,.2,1)}
+  .seg-f{background:var(--fundo)} .seg-p{background:var(--proprio)} .seg-b{background:var(--banco)}
+  .comp-legend{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+  .comp-legend .li{border-top:2px solid var(--line);padding-top:8px}
+  .comp-legend .k{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .comp-legend .v{font-family:var(--mono);font-size:15px;font-weight:600;margin-top:2px}
+  .comp-legend .pct{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+  .li.f{border-top-color:var(--fundo)} .li.p{border-top-color:var(--proprio)} .li.b{border-top-color:var(--banco)}
+  .dot{width:11px;height:11px;border-radius:2px;display:inline-block}
+  .dot.f{background:var(--fundo)} .dot.p{background:var(--proprio)} .dot.b{background:var(--banco)}
 
-  .money{position:relative}
-  .money::before{content:"R$"; position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:12.5px; color:var(--ink-faint); font-weight:500; pointer-events:none}
-  input[type=number], select{width:100%; padding:11px 12px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); background:var(--surface-2); color:var(--ink); font-family:"Space Grotesk"; font-weight:500; font-size:15px; -moz-appearance:textfield}
-  .money input{padding-left:32px}
-  input:focus, select:focus{outline:2px solid var(--fund); outline-offset:1px; border-color:var(--fund); background:#fff}
-  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
-  select{font-family:"Inter"; cursor:pointer}
+  .stat{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px dotted var(--line)}
+  .stat:last-child{border-bottom:0}
+  .stat .lab{font-size:13.5px;color:var(--muted)}
+  .stat .num{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ink);text-align:right}
+  .stat .num small{font-weight:400;color:var(--faint);font-size:12px}
+  .big{font-size:18px}
 
-  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-  .row3{display:grid; grid-template-columns:1.4fr 1fr; gap:12px}
+  .gauge{height:26px;border-radius:6px;background:var(--line);position:relative;overflow:hidden;margin:6px 0 4px}
+  .gauge > i{display:block;height:100%;transition:width .4s ease;background:var(--fundo)}
+  .gauge.over > i{background:var(--danger)}
+  .verdict{font-size:13.5px;font-weight:600;margin-top:8px;display:flex;align-items:center;gap:8px}
+  .verdict.ok{color:var(--fundo)} .verdict.no{color:var(--danger)}
+  .pill2{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:20px}
+  .pill2.ok{background:var(--fundo-bg);color:var(--fundo)} .pill2.no{background:var(--danger-bg);color:var(--danger)}
 
-  .slider-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px}
-  .slider-val{font-family:"Space Grotesk"; font-weight:600; font-size:15px; color:var(--fund)}
-  input[type=range]{-webkit-appearance:none; width:100%; height:4px; border-radius:4px; background:var(--line-strong); outline:none; padding:0; margin:6px 0 2px}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--fund); cursor:pointer; border:3px solid #fff; box-shadow:0 1px 4px rgba(14,147,132,.5)}
-  input[type=range]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--fund); cursor:pointer; border:3px solid #fff; box-shadow:0 1px 4px rgba(14,147,132,.5)}
+  .callout{background:var(--fundo-bg);border-left:3px solid var(--fundo);border-radius:0 8px 8px 0;padding:11px 14px;font-size:13px;color:#16382a;margin-top:12px}
+  .callout.warn{background:var(--banco-bg);border-left-color:var(--banco);color:#5a2f10}
 
-  .rate-readout{background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 13px; margin-top:12px; font-size:12px; color:var(--ink-soft); line-height:1.5}
-  .rate-readout b{font-family:"Space Grotesk"; color:var(--fund); font-weight:600}
-
-  .result-line{display:flex; justify-content:space-between; align-items:baseline; padding:11px 0; border-bottom:1px solid var(--line)}
-  .result-line:last-child{border-bottom:none}
-  .result-line .k{font-size:13px; color:var(--ink-soft)}
-  .result-line .v{font-family:"Space Grotesk"; font-weight:600; font-size:16px; text-align:right}
-  .v.fund{color:var(--fund)} .v.bank{color:var(--bank)} .v.big{font-size:19px}
-  .v small{font-family:"Inter"; font-weight:400; font-size:11.5px; color:var(--ink-faint); display:block; margin-top:1px}
-
-  .ideal{background:linear-gradient(180deg,#0E9384,#0B7A6E); color:#fff; border-radius:var(--radius-sm); padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:14px}
-  .ideal .txt{font-size:12.5px; color:#CFF0EB; max-width:20ch; line-height:1.4}
-  .ideal .big{font-family:"Space Grotesk"; font-weight:700; font-size:clamp(22px,5vw,30px); letter-spacing:-.01em; white-space:nowrap}
-  .ideal .big .per{font-size:.5em;color:#A9E3DB;font-weight:500}
-  .goal-msg{font-size:12px; margin:12px 2px 0; line-height:1.45; color:var(--ink-soft)}
-  .goal-msg .ok{color:var(--good); font-weight:600}
-
-  .sens table{width:100%; border-collapse:collapse}
-  .sens th{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); font-weight:600; text-align:left; padding:0 10px 10px}
-  .sens th:last-child, .sens td:last-child{text-align:right}
-  .sens td{padding:12px 10px; border-top:1px solid var(--line); font-family:"Space Grotesk"; font-weight:500; position:relative}
-  .sens tr.cur td{background:#F0F7F5}
-  .sens tr.cur td:first-child{box-shadow:inset 3px 0 0 var(--fund)}
-  .sens .price{color:var(--ink)}
-  .sens .aporte{color:var(--fund); font-weight:600}
-  .sens .barcell{position:relative}
-  .sens .barfill{position:absolute; left:10px; bottom:6px; height:3px; background:var(--fund); opacity:.35; border-radius:2px}
-  .sens .tag{display:inline-block; font-family:"Inter"; font-size:10px; font-weight:600; color:var(--fund); background:#DCF0EC; border-radius:4px; padding:1px 6px; margin-left:7px; vertical-align:middle}
-
-  .flag{font-size:11.5px; padding:9px 12px; border-radius:8px; margin-top:12px; line-height:1.45; display:none}
-  .flag.show{display:block}
-  .flag.warn{background:#FBEAE8; color:var(--warn); border:1px solid #F1C9C4}
-  .flag.info{background:#E9F6F4; color:#0B6157; border:1px solid #C7E8E2}
-
-  footer{margin-top:26px; font-size:11.5px; color:var(--ink-faint); line-height:1.5; max-width:74ch}
-  .caveat{font-size:11.5px; color:var(--ink-faint); background:#FBF6EE; border:1px solid #EBDFC9; border-radius:8px; padding:9px 12px; margin-top:14px; line-height:1.45}
-  @media (prefers-reduced-motion:reduce){*{transition:none !important}}
+  details{border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:2px 16px;margin:10px 0 26px}
+  summary{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 0;font-weight:600}
+  details[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+  .notes p{font-size:13px;color:var(--muted);margin:.5rem 0}
+  .notes strong{color:var(--ink)}
+  footer{border-top:1px solid var(--line);margin-top:8px;padding-top:16px;font-size:12px;color:var(--faint);max-width:78ch}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <p class="eyebrow">Meta de entrada · 1/3 do imóvel</p>
-    <h1>Simulador Imóvel</h1>
-    <p class="sub">A pergunta central: quanto preciso aportar por mês para juntar uma entrada de 1/3 do valor do imóvel na data da compra. Mexa no preço e no prazo e veja o aporte mudar.</p>
+
+  <header class="top">
+    <div class="eyebrow">Planejamento · compra do apartamento</div>
+    <h1>Quanto guardar por mês para juntar a entrada</h1>
+    <p class="lede">O número central é o aporte mensal que leva seus recursos próprios a 1/3 do preço do imóvel na data da compra. Abaixo, como o restante se resolve: o auxílio do Fundalemg cobre o grosso, e o banco entra só no que sobrar.</p>
   </header>
 
-  <section class="hero">
-    <p class="hero-label">Aporte mensal para dar 1/3 de entrada</p>
-    <div class="hero-num tnum"><span id="heroIdeal">—</span><span class="per">/mês</span></div>
-    <p class="hero-note" id="heroNote"></p>
+  <div class="grid">
 
-    <div class="stack">
-      <p class="stack-title">Seguindo esse aporte, como o imóvel + custos ficam cobertos</p>
-      <div class="bar" id="bar">
-        <div class="seg own" id="segOwn"></div>
-        <div class="seg fund" id="segFund"></div>
-        <div class="seg bank" id="segBank"></div>
-      </div>
-      <div class="legend">
-        <div><span class="dot own"></span>Entrada (1/3) <b id="lgOwn">—</b></div>
-        <div><span class="dot fund"></span>Fundo <b id="lgFund">—</b></div>
-        <div><span class="dot bank"></span>Banco <b id="lgBank">—</b></div>
-      </div>
-    </div>
-  </section>
+    <!-- ============ INPUTS ============ -->
+    <form id="inputs" autocomplete="off">
 
-  <div class="cols">
-    <div>
-      <div class="card">
-        <h2>Onde você está</h2>
-
-        <div class="field money">
-          <label for="recDisp">Recursos disponíveis para a entrada</label>
-          <input type="number" id="recDisp" value="185121" step="500" min="0">
-          <p class="hint">Tudo que já está reservado para o imóvel — renda fixa, bolsa e recursos da esposa, somados. Edite todo mês conforme cresce.</p>
-        </div>
-
+      <fieldset>
+        <legend>Imóvel e prazo</legend>
         <div class="field">
-          <div class="slider-head"><label for="prazoMeses" style="margin:0">Prazo até a compra</label><span class="slider-val" id="prazoVal">20 meses</span></div>
-          <input type="range" id="prazoMeses" min="6" max="36" step="1" value="20">
-          <p class="hint">Sua janela vai de 15 a 28 meses. O fundo fica disponível por volta do mês 12.</p>
+          <label for="preco">Preço do imóvel</label>
+          <div class="slider-wrap">
+            <input type="range" id="precoR" min="400000" max="1200000" step="10000" value="700000" aria-label="Preço do imóvel">
+            <span class="val-out" id="precoOut"></span>
+          </div>
+          <input type="number" id="preco" value="700000" step="10000" style="margin-top:8px">
+          <span class="hint">Sua faixa de busca é R$ 600 mil a R$ 900 mil.</span>
         </div>
-
         <div class="field">
-          <div class="slider-head"><label for="preco" style="margin:0">Preço do imóvel</label><span class="slider-val" id="precoVal">R$ 850.000</span></div>
-          <input type="range" id="preco" min="600000" max="1200000" step="10000" value="850000">
+          <label for="prazoCompraR">Meses até a compra</label>
+          <div class="slider-wrap">
+            <input type="range" id="prazoCompraR" min="6" max="36" step="1" value="20" aria-label="Meses até a compra">
+            <span class="val-out" id="prazoCompraOut"></span>
+          </div>
+          <span class="hint">Sua janela é de 15 a 28 meses. O Fundalemg só destrava ao fim do estágio probatório — confirme a data.</span>
         </div>
+        <div class="field">
+          <label for="meta">Meta de entrada própria (% do preço)</label>
+          <input type="number" id="meta" value="33.33" step="0.01">
+          <span class="hint">33,33% = 1/3 do imóvel, o alvo da sua entrada própria.</span>
+        </div>
+      </fieldset>
 
+      <fieldset>
+        <legend>Recursos próprios</legend>
+        <div class="field">
+          <label for="propriosHoje">Recursos próprios hoje (inclui a esposa)</label>
+          <input type="number" id="propriosHoje" value="300000" step="5000">
+          <span class="hint">Carteira carimbada para o apê. Sua reserva de emergência fica de fora disto.</span>
+        </div>
         <div class="row2">
           <div class="field">
-            <label for="pctCDI">Rendimento (% do CDI)</label>
-            <div style="position:relative"><input type="number" id="pctCDI" value="100" step="1" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">%</span></div>
+            <label for="aporte">Aporte mensal atual</label>
+            <input type="number" id="aporte" value="3000" step="100">
           </div>
           <div class="field">
-            <label for="ir">IR médio sobre o ganho</label>
-            <div style="position:relative"><input type="number" id="ir" value="17.5" step="0.5" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">%</span></div>
+            <label for="rentab">Rendimento líquido (% a.a.)</label>
+            <input type="number" id="rentab" value="11.5" step="0.1">
           </div>
         </div>
-        <div class="rate-readout">
-          Rende pela <b>Selic projetada do Focus</b> — 14% hoje, caindo a ~12% em 2027 e ~10,5% em 2028 —, mês a mês, líquida de IR. Taxa líquida média no seu prazo: <b id="rTaxaEfetiva">—</b> a.a.
-        </div>
+      </fieldset>
 
-        <div class="field" style="margin-top:15px">
-          <label for="custos">Custos de aquisição</label>
-          <div style="position:relative"><input type="number" id="custos" value="4.5" step="0.5" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">%</span></div>
-          <p class="hint">ITBI (3% em BH) + registro.</p>
+      <fieldset>
+        <legend>Auxílio Fundalemg</legend>
+        <div class="field">
+          <label for="auxilioR">Valor do auxílio a tomar (concedido)</label>
+          <div class="slider-wrap">
+            <input type="range" id="auxilioR" min="0" max="382760" step="1000" value="382760" aria-label="Valor do auxílio">
+            <span class="val-out" id="auxilioOut"></span>
+          </div>
+          <label class="check" style="margin-top:9px"><input type="checkbox" id="maximizar" checked>Maximizar o fundo (usar o máximo que o teto e o preço permitem)</label>
         </div>
-      </div>
-
-      <div class="card">
-        <h2>Financiamento</h2>
-
-        <div class="field money">
-          <label for="fundoValor">Valor pelo fundo do trabalho</label>
-          <input type="number" id="fundoValor" value="300000" step="5000" min="0">
-          <p class="hint">Confira o teto e se ele é combinável com o banco no mesmo imóvel.</p>
-        </div>
-        <div class="row3">
+        <div class="row2">
           <div class="field">
-            <label for="fundoTaxa">Juros do fundo</label>
-            <div style="position:relative"><input type="number" id="fundoTaxa" value="6" step="0.25" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">% a.a.</span></div>
+            <label for="teto">Teto do auxílio (R$)</label>
+            <input type="number" id="teto" value="382760" step="1000">
           </div>
           <div class="field">
-            <label for="fundoPrazo">Prazo</label>
-            <div style="position:relative"><input type="number" id="fundoPrazo" value="240" step="12" min="12"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:12px">meses</span></div>
+            <label for="prazoFundo">Amortização (meses, máx 120)</label>
+            <input type="number" id="prazoFundo" value="120" step="1" max="120" min="1">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="juros">Juros compensatórios (%)</label>
+            <input type="number" id="juros" value="8" step="0.5">
+          </div>
+          <div class="field">
+            <label for="reaj">Reajuste anual do saldo (% a.a.)</label>
+            <input type="number" id="reaj" value="4" step="0.5">
           </div>
         </div>
         <div class="field">
-          <label for="fundoSist">Sistema de amortização</label>
-          <select id="fundoSist"><option value="SAC">SAC (parcela decrescente)</option><option value="PRICE">Price (parcela fixa)</option></select>
-        </div>
-
-        <div style="height:1px;background:var(--line);margin:6px 0 16px"></div>
-
-        <div class="field">
-          <label>Valor pelo banco</label>
-          <div style="padding:11px 12px;border:1px dashed var(--line-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:'Space Grotesk';font-weight:600;font-size:16px;color:var(--bank)" class="tnum" id="bancoValorBox">—</div>
-          <p class="hint">Resíduo: preço + custos − entrada de 1/3 − fundo.</p>
-        </div>
-        <div class="row3">
-          <div class="field">
-            <label for="bancoTaxa">Juros do banco</label>
-            <div style="position:relative"><input type="number" id="bancoTaxa" value="11.5" step="0.25" min="0"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:13px">% a.a.</span></div>
-            <p class="hint">SBPE + TR (hoje ~11–12%).</p>
-          </div>
-          <div class="field">
-            <label for="bancoPrazo">Prazo</label>
-            <div style="position:relative"><input type="number" id="bancoPrazo" value="360" step="12" min="12"><span style="position:absolute;right:12px;top:11px;color:var(--ink-faint);font-size:12px">meses</span></div>
-          </div>
+          <label class="check"><input type="checkbox" id="descLib" checked>8% descontado na liberação — você recebe 92% do valor concedido</label>
+          <span class="hint">A redação da Deliberação sugere isto, mas confirme a mecânica na DRH. O saldo é corrigido pela tabela de vencimentos da ALMG (campo acima).</span>
         </div>
         <div class="field">
-          <label for="bancoSist">Sistema de amortização</label>
-          <select id="bancoSist"><option value="SAC">SAC (parcela decrescente)</option><option value="PRICE">Price (parcela fixa)</option></select>
+          <label for="seguro">Prêmio de seguro (R$/mês, opcional)</label>
+          <input type="number" id="seguro" value="0" step="10">
         </div>
-        <div class="field money">
-          <label for="renda">Renda familiar mensal <span style="color:var(--ink-faint);font-weight:400">(opcional)</span></label>
-          <input type="number" id="renda" value="0" step="500" min="0">
-          <p class="hint">Para checar se as parcelas cabem no limite de ~30% da renda.</p>
-        </div>
-      </div>
-    </div>
+      </fieldset>
 
-    <div>
-      <div class="card">
-        <h2>A meta de 1/3</h2>
-        <div class="result-line"><span class="k">Meta de entrada (1/3 do imóvel)</span><span class="v big tnum" id="rTerco">—</span></div>
-        <div class="result-line"><span class="k">Você tem hoje</span><span class="v tnum" id="rHoje">—</span></div>
-        <div class="result-line"><span class="k">Projeção sem aportar (só rendimento)</span><span class="v tnum" id="rSemAporte">—</span></div>
-        <div class="result-line"><span class="k">A cobrir com aportes</span><span class="v tnum" id="rCobrir">—</span></div>
-        <div class="ideal">
-          <div class="txt">Aporte mensal necessário</div>
-          <div class="big tnum"><span id="idealNum">—</span><span class="per">/mês</span></div>
+      <fieldset>
+        <legend>Banco (SBPE) — só o resíduo</legend>
+        <div class="row2">
+          <div class="field">
+            <label for="taxaBanco">Taxa efetiva (% a.a., c/ TR)</label>
+            <input type="number" id="taxaBanco" value="11.5" step="0.1">
+          </div>
+          <div class="field">
+            <label for="prazoBanco">Prazo (meses)</label>
+            <input type="number" id="prazoBanco" value="360" step="12">
+          </div>
         </div>
-        <p class="goal-msg" id="goalMsg"></p>
+        <div class="field">
+          <label>Sistema de amortização</label>
+          <div class="seg" role="group" aria-label="Sistema de amortização">
+            <button type="button" id="btnSAC" aria-pressed="true">SAC</button>
+            <button type="button" id="btnPrice" aria-pressed="false">Price</button>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Margem consignável</legend>
+        <div class="field">
+          <label for="liquida">Remuneração líquida (R$/mês)</label>
+          <input type="number" id="liquida" value="15500" step="500">
+          <span class="hint">Após descontos obrigatórios (previdência, IR). Está no seu contracheque.</span>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="percMargem">Margem p/ financiamento (%)</label>
+            <input type="number" id="percMargem" value="30" step="1">
+          </div>
+          <div class="field">
+            <label for="consignados">Consignados já ativos (R$/mês)</label>
+            <input type="number" id="consignados" value="0" step="100">
+          </div>
+        </div>
+        <span class="hint">Referência estadual (Lei 19.490/2011): até 30% da líquida. Confirme a norma da ALMG.</span>
+      </fieldset>
+
+    </form>
+
+    <!-- ============ RESULTS ============ -->
+    <div class="results">
+
+      <!-- HERO: aporte mensal para 1/3 -->
+      <div class="hero">
+        <div class="cap" id="heroCap">Aporte mensal para juntar 1/3 do imóvel</div>
+        <div class="amount" id="aporteHero">—</div>
+        <div class="per">por mês, até a data da compra</div>
+        <div class="sub">
+          <div><div class="k">Meta (entrada própria)</div><div class="v" id="alvoV">—</div></div>
+          <div><div class="k">Projeção dos próprios na data</div><div class="v" id="projV">—</div></div>
+        </div>
+        <div class="status" id="heroStatus"></div>
       </div>
 
-      <div class="card">
-        <h2>Resumo do plano</h2>
-        <div class="result-line"><span class="k">Preço + custos de aquisição</span><span class="v tnum" id="rTotal">—</span></div>
-        <div class="result-line"><span class="k">Entrada (1/3)</span><span class="v tnum" id="rEntrada">—</span></div>
-        <div class="result-line"><span class="k">Financiado no fundo</span><span class="v fund tnum" id="rFundo">—<small id="rFundoParc"></small></span></div>
-        <div class="result-line"><span class="k">Financiado no banco</span><span class="v bank tnum" id="rBanco">—<small id="rBancoParc"></small></span></div>
-        <div class="result-line"><span class="k">1ª parcela somada (fundo + banco)</span><span class="v tnum" id="rParcTotal">—<small id="rComprometimento"></small></span></div>
-        <div class="flag warn" id="flagCap"></div>
-        <div class="flag info" id="flagSobra"></div>
+      <div class="panel">
+        <h2>Como o restante do preço se resolve</h2>
+        <div class="compbar" id="compbar" aria-hidden="true">
+          <i class="seg-f" id="barF"></i><i class="seg-p" id="barP"></i><i class="seg-b" id="barB"></i>
+        </div>
+        <div class="comp-legend">
+          <div class="li f"><div class="k"><i class="dot f"></i>Fundo</div><div class="v" id="vFundo"></div><div class="pct" id="pFundo"></div></div>
+          <div class="li p"><div class="k"><i class="dot p"></i>Próprios</div><div class="v" id="vProprio"></div><div class="pct" id="pProprio"></div></div>
+          <div class="li b"><div class="k"><i class="dot b"></i>Banco</div><div class="v" id="vBanco"></div><div class="pct" id="pBanco"></div></div>
+        </div>
+        <div id="calloutBanco"></div>
       </div>
+
+      <div class="panel">
+        <h2>Parcelas mensais depois da compra</h2>
+        <div class="stat"><span class="lab">Fundalemg — 1ª parcela <small id="fundoSeg"></small></span><span class="num" id="parcelaFundo"></span></div>
+        <div class="stat"><span class="lab">Fundalemg — parcela máx. (c/ reajuste)</span><span class="num" id="parcelaFundoMax"></span></div>
+        <div class="stat"><span class="lab" id="labBanco">Banco — parcela</span><span class="num" id="parcelaBanco"></span></div>
+        <div class="stat"><span class="lab">Soma no 1º mês</span><span class="num big" id="somaMes"></span></div>
+      </div>
+
+      <div class="panel">
+        <h2>Margem consignável — a parcela do fundo cabe?</h2>
+        <div class="gauge" id="gauge"><i id="gaugeFill"></i></div>
+        <div class="stat"><span class="lab">Parcela do fundo (+ seguro)</span><span class="num" id="mgParcela"></span></div>
+        <div class="stat"><span class="lab">Margem disponível</span><span class="num" id="mgDisp"></span></div>
+        <div class="verdict" id="mgVerdict"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Outra referência de aporte</h2>
+        <div class="stat"><span class="lab">Aporte p/ zerar o banco (não financiar nada)</span><span class="num big" id="aporteZerar"></span></div>
+        <div class="stat"><span class="lab">Economia por usar o fundo vs. banco</span><span class="num" id="economia"></span></div>
+        <div id="calloutAporte"></div>
+      </div>
+
     </div>
   </div>
 
-  <div class="card sens">
-    <h2>Aporte ideal por preço do imóvel</h2>
-    <table>
-      <thead><tr><th>Preço do imóvel</th><th>Entrada (1/3)</th><th>Aporte / mês</th></tr></thead>
-      <tbody id="sensBody"></tbody>
-    </table>
-    <div class="caveat">Material de apoio, não recomendação de investimento. Projeções e parcelas são estimativas: a Selic futura é a do Boletim Focus e pode mudar; a carteira tem títulos travados que não seguem exatamente a Selic. Confirme na simulação oficial do banco e no regulamento do fundo.</div>
-  </div>
+  <details class="notes">
+    <summary>Premissas e pontos a confirmar</summary>
+    <p><strong>O número central.</strong> É o aporte mensal que faz seus recursos próprios (valor de hoje + aportes, rendendo à taxa informada) atingirem a meta de entrada — 1/3 do preço por padrão — na data da compra.</p>
+    <p><strong>Ordem de uso do capital.</strong> No painel de composição, o simulador empilha do mais barato ao mais caro: esgota o Fundalemg (até o teto ou o preço), aplica os recursos próprios e joga o restante no banco.</p>
+    <p><strong>Os 8% do Fundalemg.</strong> Encargo único sobre o valor concedido, descontado na liberação — não uma taxa ao ano. Assumindo o desconto na liberação, você recebe 92% do concedido e amortiza 100% em até 120 meses. Confirme a mecânica exata na DRH.</p>
+    <p><strong>Correção do saldo.</strong> Pela tabela de vencimentos da ALMG, não por TR/IPCA/CDI. O "reajuste anual" é estimativa sua.</p>
+    <p><strong>Margem e elegibilidade.</strong> Percentual de referência da Lei estadual 19.490/2011 (confirme a norma da ALMG); auxílio vedado em estágio probatório; aquisição exige não ser proprietário; imóvel na RMBH/Colar; saída da ALMG antecipa o vencimento.</p>
+  </details>
 
   <footer>
-    Como o rendimento é calculado: os recursos e cada aporte crescem mês a mês pela Selic projetada do Focus (14% em ago/2026, caindo para ~12% ao fim de 2027 e ~10,5% ao fim de 2028, interpolada entre esses pontos), ajustada pelo % do CDI e líquida do IR médio informado. Cada aporte rende do mês em que entra até a compra. A bolsa está embutida no total e é tratada como renda fixa. A entrada de 1/3 é só o que sai do seu bolso — fundo e banco são financiamento. Quando o que você já tem, rendendo, já passa de 1/3, o aporte necessário é zero.
+    Ferramenta de planejamento pessoal — não é recomendação de investimento nem parecer jurídico. Confirme as premissas nas fontes oficiais (Deliberação da Mesa nº 2.867/2025, DRH/Câmara de Apoio Habitacional da ALMG e sua corretora/banco) antes de decidir.
   </footer>
+
 </div>
 
 <script>
 (function(){
   const $ = id => document.getElementById(id);
-  const brl0 = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(Math.max(0,Math.round(v)));
-  const brl2 = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.max(0,v));
-  const num = id => { const n = parseFloat($(id).value); return isNaN(n)?0:n; };
+  const BRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+  const num = v => { const n = parseFloat(v); return isFinite(n)?n:0; };
+  let sistema='SAC';
 
-  // Selic path (Focus) — annual % by month offset from Aug/2026
-  const ANCHORS = [[0,14.00],[4,13.75],[16,12.00],[28,10.50]];
-  function selicAt(m){
-    if(m<=ANCHORS[0][0]) return ANCHORS[0][1];
-    for(let k=0;k<ANCHORS.length-1;k++){
-      if(m<=ANCHORS[k+1][0]){
-        const [m0,v0]=ANCHORS[k], [m1,v1]=ANCHORS[k+1];
-        return v0+(v1-v0)*(m-m0)/(m1-m0);
-      }
+  function fundoSchedule(concedido, prazo, reajAnual, seguro){
+    prazo=Math.max(1,Math.round(prazo));
+    let saldo=concedido,restante=prazo,amort=saldo/restante,first=0,max=0,total=0;const rA=reajAnual/100;
+    for(let m=1;m<=prazo;m++){
+      if(m>1 && (m-1)%12===0){ saldo*=(1+rA); restante=prazo-(m-1); amort=saldo/restante; }
+      const parcela=amort+seguro; if(m===1)first=parcela; if(parcela>max)max=parcela; total+=parcela; saldo-=amort;
     }
-    return ANCHORS[ANCHORS.length-1][1];
+    return {first,max,total};
   }
-  // month-by-month net monthly rates for horizon n
-  function rates(n, pctCDI, ir){
-    const im=[];
-    for(let m=1;m<=n;m++){
-      const grossA = selicAt(m) * (pctCDI/100) * (1 - ir/100);
-      im.push(Math.pow(1+grossA/100, 1/12) - 1);
-    }
-    return im;
+  function bancoCalc(valor, taxaAnual, prazo, sist){
+    prazo=Math.max(1,Math.round(prazo)); const i=Math.pow(1+taxaAnual/100,1/12)-1;
+    if(valor<=0) return {parcela1:0,parcelaN:0,total:0,price:0};
+    if(sist==='Price'){ const p=i>0?valor*i/(1-Math.pow(1+i,-prazo)):valor/prazo; return {parcela1:p,parcelaN:p,total:p*prazo,price:p}; }
+    const amort=valor/prazo; let saldo=valor,total=0,p1=0,pN=0;
+    for(let m=1;m<=prazo;m++){ const juros=saldo*i; const parc=amort+juros; if(m===1)p1=parc; if(m===prazo)pN=parc; total+=parc; saldo-=amort; }
+    return {parcela1:p1,parcelaN:pN,total,price:0};
   }
-  // growth factors: potF (existing pot), annF (per-unit monthly aporte, end-of-month)
-  function factors(im){
-    let potF=1; for(const i of im) potF*=(1+i);
-    let annF=0;
-    for(let k=1;k<=im.length;k++){ let f=1; for(let m=k+1;m<=im.length;m++) f*=(1+im[m-1]); annF+=f; }
-    return {potF, annF};
-  }
-  function financing(pv, aa, n, sys){
-    if(pv<=0||n<=0) return {first:0,last:0,fixed:0,total:0};
-    const i = Math.pow(1+aa/100, 1/12) - 1;
-    if(sys==='PRICE'){
-      const pmt = (i===0)? pv/n : pv*i/(1-Math.pow(1+i,-n));
-      return {first:pmt, last:pmt, fixed:pmt, total:pmt*n - pv};
+  function futureValue(pv,pmt,r,n){ n=Math.max(0,Math.round(n)); if(r===0)return pv+pmt*n; const g=Math.pow(1+r,n); return pv*g+pmt*(g-1)/r; }
+  function pmtNeeded(target,pv,r,n){ n=Math.max(1,Math.round(n)); const g=Math.pow(1+r,n); const grown=pv*g; if(grown>=target)return 0; if(r===0)return (target-pv)/n; return (target-grown)/((g-1)/r); }
+
+  $('btnSAC').addEventListener('click',()=>{sistema='SAC';$('btnSAC').setAttribute('aria-pressed','true');$('btnPrice').setAttribute('aria-pressed','false');calc();});
+  $('btnPrice').addEventListener('click',()=>{sistema='Price';$('btnPrice').setAttribute('aria-pressed','true');$('btnSAC').setAttribute('aria-pressed','false');calc();});
+  $('inputs').addEventListener('input',calc);
+
+  // preco range <-> number
+  $('precoR').addEventListener('input',()=>{$('preco').value=$('precoR').value;$('precoOut').textContent=BRL.format(+$('precoR').value);calc();});
+  $('preco').addEventListener('input',()=>{let v=+$('preco').value;const r=$('precoR');if(v>=+r.min&&v<=+r.max){r.value=v;}$('precoOut').textContent=BRL.format(v);calc();});
+  $('prazoCompraR').addEventListener('input',()=>{$('prazoCompraOut').textContent=$('prazoCompraR').value+' meses';calc();});
+  $('auxilioR').addEventListener('input',calc);
+
+  function calc(){
+    const preco=num($('preco').value);
+    const prazoCompra=num($('prazoCompraR').value);
+    const meta=num($('meta').value);
+    const teto=num($('teto').value);
+    const auxMax=Math.max(0,Math.min(teto,preco));
+    const auxR=$('auxilioR'); auxR.max=auxMax||0;
+    if($('maximizar').checked){ auxR.value=auxMax; auxR.disabled=true; }
+    else { auxR.disabled=false; if(+auxR.value>auxMax)auxR.value=auxMax; }
+    const concedido=Math.min(num(auxR.value),auxMax);
+    $('auxilioOut').textContent=BRL.format(concedido);
+
+    const juros=num($('juros').value), descLib=$('descLib').checked;
+    const prazoFundo=Math.min(120,Math.max(1,num($('prazoFundo').value)));
+    const reaj=num($('reaj').value), seguro=num($('seguro').value);
+    const propriosHoje=num($('propriosHoje').value), aporte=num($('aporte').value), rentab=num($('rentab').value);
+    const rM=Math.pow(1+rentab/100,1/12)-1;
+    const taxaBanco=num($('taxaBanco').value), prazoBanco=num($('prazoBanco').value);
+    const liquida=num($('liquida').value), percMargem=num($('percMargem').value), consignados=num($('consignados').value);
+
+    // ---- HERO: aporte para a meta (1/3) ----
+    const alvo=preco*(meta/100);
+    const propriosNaData=futureValue(propriosHoje,aporte,rM,prazoCompra);
+    const aporteMeta=pmtNeeded(alvo,propriosHoje,rM,prazoCompra);
+    $('aporteHero').textContent=BRL.format(aporteMeta);
+    $('alvoV').textContent=BRL.format(alvo);
+    $('projV').textContent=BRL.format(propriosNaData);
+    const hs=$('heroStatus');
+    if(aporteMeta<=0){
+      hs.innerHTML='<span class="pill ok">meta já alcançada</span> Sem aporte, seus recursos já chegam ao alvo na data.';
+    } else if(aporteMeta<=aporte){
+      hs.innerHTML='<span class="pill ok">no ritmo</span> Seu aporte atual de '+BRL.format(aporte)+' já supera o necessário.';
     } else {
-      const amort = pv/n;
-      return {first:amort+pv*i, last:amort+amort*i, total:i*pv*(n+1)/2};
+      hs.innerHTML='<span class="pill no">acima do atual</span> Seu aporte atual é '+BRL.format(aporte)+'. Faltam '+BRL.format(aporteMeta-aporte)+'/mês.';
     }
+
+    // ---- Composição (fundo -> próprios -> banco) ----
+    const fundoNet=descLib?concedido*(1-juros/100):concedido;
+    const restanteAposFundo=Math.max(0,preco-fundoNet);
+    const propriosAplicados=Math.min(propriosNaData,restanteAposFundo);
+    const banco=Math.max(0,restanteAposFundo-propriosAplicados);
+    const propriosSobra=Math.max(0,propriosNaData-propriosAplicados);
+    const pf=preco>0?fundoNet/preco*100:0, pp=preco>0?propriosAplicados/preco*100:0, pb=preco>0?banco/preco*100:0;
+    $('barF').style.width=pf+'%'; $('barP').style.width=pp+'%'; $('barB').style.width=pb+'%';
+    $('vFundo').textContent=BRL.format(fundoNet); $('pFundo').textContent=pf.toFixed(0)+'% do preço';
+    $('vProprio').textContent=BRL.format(propriosAplicados); $('pProprio').textContent=pp.toFixed(0)+'% do preço';
+    $('vBanco').textContent=BRL.format(banco); $('pBanco').textContent=pb.toFixed(0)+'% do preço';
+    const cb=$('calloutBanco');
+    if(banco<=0){ cb.className='callout'; cb.innerHTML='<strong>Banco zerado.</strong> Fundo + próprios cobrem a compra'+(propriosSobra>500?'. Sobram '+BRL.format(propriosSobra)+', que ficam investidos.':'.'); }
+    else { const ltv=preco>0?banco/preco*100:0; cb.className='callout warn'; cb.innerHTML='<strong>Falta '+BRL.format(banco)+' para o banco</strong> — LTV de '+ltv.toFixed(0)+'%. Quanto menor, melhor a taxa.'; }
+
+    // ---- Parcelas ----
+    const fs=fundoSchedule(concedido,prazoFundo,reaj,seguro);
+    $('parcelaFundo').textContent=BRL.format(fs.first);
+    $('parcelaFundoMax').textContent=BRL.format(fs.max);
+    $('fundoSeg').textContent=seguro>0?'(inclui seguro)':'';
+    const bc=bancoCalc(banco,taxaBanco,prazoBanco,sistema);
+    if(banco<=0){ $('labBanco').textContent='Banco — parcela'; $('parcelaBanco').textContent='—'; }
+    else if(sistema==='SAC'){ $('labBanco').textContent='Banco — 1ª → última (SAC)'; $('parcelaBanco').innerHTML=BRL.format(bc.parcela1)+' <small>→ '+BRL.format(bc.parcelaN)+'</small>'; }
+    else { $('labBanco').textContent='Banco — parcela fixa (Price)'; $('parcelaBanco').textContent=BRL.format(bc.price); }
+    $('somaMes').textContent=BRL.format(fs.first+(banco>0?(sistema==='Price'?bc.price:bc.parcela1):0));
+
+    // ---- Margem ----
+    const margemDisp=Math.max(0,liquida*(percMargem/100)-consignados);
+    $('mgParcela').textContent=BRL.format(fs.first);
+    $('mgDisp').textContent=BRL.format(margemDisp);
+    const ratio=margemDisp>0?fs.first/margemDisp:(fs.first>0?2:0);
+    const g=$('gauge'); $('gaugeFill').style.width=Math.min(100,ratio*100)+'%';
+    const v=$('mgVerdict');
+    if(fs.first<=margemDisp){ g.classList.remove('over'); v.className='verdict ok'; v.innerHTML='<span class="pill2 ok">cabe</span> Folga de '+BRL.format(margemDisp-fs.first)+'/mês — quem limita é o teto do fundo, não a folha.'; }
+    else { g.classList.add('over'); v.className='verdict no'; v.innerHTML='<span class="pill2 no">estoura</span> Faltam '+BRL.format(fs.first-margemDisp)+'/mês. Reduza o auxílio ou alongue o prazo.'; }
+
+    // ---- Outra referência: aporte p/ zerar banco + custo ----
+    const aporteZerar=pmtNeeded(restanteAposFundo,propriosHoje,rM,prazoCompra);
+    $('aporteZerar').textContent=BRL.format(aporteZerar);
+    const beq=bancoCalc(concedido,taxaBanco,prazoFundo,sistema);
+    const eco=beq.total-fs.total;
+    $('economia').textContent=(eco>=0?'+ ':'- ')+BRL.format(Math.abs(eco));
+    const ca=$('calloutAporte');
+    ca.className='callout';
+    ca.innerHTML='Aportando os '+BRL.format(aporteMeta)+' da meta você chega a 1/3; para <em>não financiar nada</em> no banco, o aporte seria '+BRL.format(aporteZerar)+'/mês.';
+
+    $('precoOut').textContent=BRL.format(preco);
+    $('prazoCompraOut').textContent=prazoCompra+' meses';
   }
 
-  function compute(){
-    const recDisp   = num('recDisp');
-    const n         = Math.max(1, num('prazoMeses'));
-    const preco     = num('preco');
-    const pctCDI    = num('pctCDI');
-    const ir        = num('ir');
-    const custosPct = num('custos');
-    const fundoVal  = num('fundoValor');
-    const fundoTaxa = num('fundoTaxa');
-    const fundoPz   = num('fundoPrazo');
-    const fundoSist = $('fundoSist').value;
-    const bancoTaxa = num('bancoTaxa');
-    const bancoPz   = num('bancoPrazo');
-    const bancoSist = $('bancoSist').value;
-    const renda     = num('renda');
-
-    $('prazoVal').textContent = n + (n===1?' mês':' meses');
-    $('precoVal').textContent = brl0(preco);
-
-    const im = rates(n, pctCDI, ir);
-    const {potF, annF} = factors(im);
-    const taxaEfetivaAA = (Math.pow(potF, 12/n) - 1)*100;
-    $('rTaxaEfetiva').textContent = taxaEfetivaAA.toFixed(1).replace('.',',') + '%';
-
-    const custos   = preco * custosPct/100;
-    const totalNec = preco + custos;
-    const terco    = preco/3;
-
-    const semAporte = recDisp * potF;
-    const idealA = semAporte >= terco ? 0 : (terco - semAporte)/annF;
-    const entrada = semAporte + idealA*annF;   // = terço if idealA>0, else grown resources
-    let banco = totalNec - entrada - fundoVal;
-    const sobra = banco < 0 ? -banco : 0;
-    if(banco < 0) banco = 0;
-
-    // HERO
-    $('heroIdeal').textContent = brl0(idealA);
-    $('heroNote').innerHTML = idealA > 0
-      ? `Para juntar <b>${brl0(terco)}</b> (1/3 de um imóvel de ${brl0(preco)}) em <b>${n} meses</b>, partindo dos ${brl0(recDisp)} que você já tem, a ~${taxaEfetivaAA.toFixed(1).replace('.',',')}% a.a. líquidos.`
-      : `Você já tem o suficiente: os ${brl0(recDisp)} atuais rendem até <b>${brl0(semAporte)}</b>, acima da meta de ${brl0(terco)}. Não precisa aportar mais para o 1/3.`;
-
-    // bar
-    const ownShown = Math.min(entrada, totalNec);
-    const fundShown = Math.min(fundoVal, Math.max(0,totalNec-ownShown));
-    const bankShown = banco;
-    const sumBar = ownShown+fundShown+bankShown || 1;
-    $('segOwn').style.width  = (ownShown/sumBar*100)+'%';
-    $('segFund').style.width = (fundShown/sumBar*100)+'%';
-    $('segBank').style.width = (bankShown/sumBar*100)+'%';
-    $('lgOwn').textContent  = brl0(entrada);
-    $('lgFund').textContent = brl0(fundoVal);
-    $('lgBank').textContent = brl0(banco);
-
-    // meta card
-    $('rTerco').textContent = brl0(terco);
-    $('rHoje').textContent  = brl0(recDisp);
-    $('rSemAporte').textContent = brl0(semAporte);
-    $('rCobrir').textContent = brl0(Math.max(0, terco - semAporte));
-    $('idealNum').textContent = brl0(idealA);
-    $('goalMsg').innerHTML = idealA>0
-      ? `Aportando <b>${brl0(idealA)}/mês</b>, sua entrada chega exatamente a 1/3 do imóvel na compra.`
-      : `<span class="ok">Meta já atingida.</span> Qualquer aporte extra reduz ainda mais o banco.`;
-
-    // plano
-    const fF = financing(fundoVal, fundoTaxa, fundoPz, fundoSist);
-    const fB = financing(banco, bancoTaxa, bancoPz, bancoSist);
-    const parc1 = fF.first + fB.first;
-    $('rTotal').textContent   = brl0(totalNec);
-    $('rEntrada').textContent = brl0(entrada);
-    $('rFundo').firstChild.textContent = brl0(fundoVal);
-    $('rBanco').firstChild.textContent = brl0(banco);
-    $('bancoValorBox').textContent = brl0(banco);
-    const descF = fundoSist==='SAC' ? `1ª parcela ${brl2(fF.first)} · cai até ${brl2(fF.last)}` : `parcela fixa ${brl2(fF.fixed)}`;
-    const descB = bancoSist==='SAC' ? `1ª parcela ${brl2(fB.first)} · cai até ${brl2(fB.last)}` : `parcela fixa ${brl2(fB.fixed)}`;
-    $('rFundoParc').textContent = fundoVal>0 ? descF : '';
-    $('rBancoParc').textContent = banco>0 ? descB : '';
-    $('rParcTotal').firstChild.textContent = brl2(parc1);
-    if(renda>0){
-      const comp = parc1/renda*100;
-      $('rComprometimento').textContent = `${comp.toFixed(0)}% da renda (limite ~30%)`;
-      $('rComprometimento').style.color = comp>30 ? 'var(--warn)' : 'var(--good)';
-    } else $('rComprometimento').textContent = '';
-
-    const pctFin = preco>0 ? banco/preco*100 : 0;
-    const flagCap = $('flagCap');
-    if(pctFin > 80){ flagCap.classList.add('show'); flagCap.textContent = `Atenção: financiar ${pctFin.toFixed(0)}% ultrapassa o teto de ~80% que o banco costuma cobrir. Aumente o fundo ou reduza o preço.`; }
-    else flagCap.classList.remove('show');
-    const flagSobra = $('flagSobra');
-    if(sobra > 0){ flagSobra.classList.add('show'); flagSobra.textContent = `Com 1/3 de entrada + fundo você cobre tudo e ainda sobram ${brl0(sobra)} — dá para usar menos do fundo ou mirar um imóvel melhor.`; }
-    else flagSobra.classList.remove('show');
-
-    // sensitivity: aporte ideal por preço (preço atual ± 50k, ± 100k)
-    const pts = [...new Set([preco-100000,preco-50000,preco,preco+50000,preco+100000].filter(p=>p>=600000))].sort((a,b)=>a-b);
-    const rows = pts.map(p=>{ const t=p/3; const A = semAporte>=t?0:(t-semAporte)/annF; return {p, t, A}; });
-    const maxA = Math.max(1, ...rows.map(r=>r.A));
-    $('sensBody').innerHTML = rows.map(r=>{
-      const cur = (r.p===preco) ? ' class="cur"' : '';
-      const tag = (r.p===preco) ? '<span class="tag">atual</span>' : '';
-      const w = (r.A/maxA*100);
-      return `<tr${cur}><td class="price">${brl0(r.p)}${tag}</td><td class="tnum">${brl0(r.t)}</td><td class="barcell tnum"><span class="aporte">${brl0(r.A)}</span><span class="barfill" style="width:${w*0.55}%"></span></td></tr>`;
-    }).join('');
-  }
-
-  ['recDisp','prazoMeses','preco','pctCDI','ir','custos',
-   'fundoValor','fundoTaxa','fundoPrazo','fundoSist','bancoTaxa','bancoPrazo','bancoSist','renda']
-   .forEach(id => { $(id).addEventListener('input', compute); $(id).addEventListener('change', compute); });
-
-  compute();
+  calc();
 })();
 </script>
 </body>
