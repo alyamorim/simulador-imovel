@@ -1,444 +1,855 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aporte mensal para a entrada — planejador da compra</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador — composição de compra de imóvel</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#ECEFEC; --paper:#FFFFFF; --ink:#17231F; --muted:#5C6862; --faint:#8A968F;
-    --line:#D7DED9; --line-strong:#C3CDC6;
-    --fundo:#1F7A54; --fundo-bg:#E4F0EA;
-    --proprio:#345E8C; --proprio-bg:#E3EAF3;
-    --banco:#BB5A22; --banco-bg:#F6E7DA;
-    --danger:#B0342F; --danger-bg:#F6E1DF;
-    --serif:"Charter","Bitstream Charter","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --mono:ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
+  :root {
+    --bg: #F6F2E9;
+    --bg-panel: #EFE9DC;
+    --bg-field: #FCFAF4;
+    --border: #D9D0BC;
+    --ink: #24312D;
+    --ink-soft: #6B7268;
+    --accent: #B8543A;
+    --accent-tint: #E8D2C6;
+    --positive: #4B6A5E;
+    --positive-tint: #DCE6DF;
+    --warn: #9C6B23;
+    --warn-tint: #EFE0C4;
+    --bank: #6B7A94;
+    --bank-tint: #DDE1EA;
+    --focus: #8A4430;
+    --serif: 'Spectral', Georgia, 'Times New Roman', serif;
+    --sans: 'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
   }
-  *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;font-size:16px}
-  .wrap{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,40px)}
 
-  header.top{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:26px}
-  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.08;margin:.35rem 0 .5rem;letter-spacing:-.01em}
-  .lede{color:var(--muted);max-width:64ch;font-size:15px}
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #1C1B16;
+      --bg-panel: #262520;
+      --bg-field: #201F1A;
+      --border: #3C3A31;
+      --ink: #EAE5D8;
+      --ink-soft: #A8A192;
+      --accent: #E0835F;
+      --accent-tint: #4A3226;
+      --positive: #8FB09E;
+      --positive-tint: #2C3A32;
+      --warn: #D6A54F;
+      --warn-tint: #3E3420;
+      --bank: #9AABC7;
+      --bank-tint: #2A3140;
+      --focus: #E0835F;
+    }
+  }
 
-  .grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:30px;align-items:start}
-  @media(max-width:880px){.grid{grid-template-columns:1fr;gap:22px}}
+  :root[data-theme="dark"] {
+    --bg: #1C1B16;
+    --bg-panel: #262520;
+    --bg-field: #201F1A;
+    --border: #3C3A31;
+    --ink: #EAE5D8;
+    --ink-soft: #A8A192;
+    --accent: #E0835F;
+    --accent-tint: #4A3226;
+    --positive: #8FB09E;
+    --positive-tint: #2C3A32;
+    --warn: #D6A54F;
+    --warn-tint: #3E3420;
+    --bank: #9AABC7;
+    --bank-tint: #2A3140;
+    --focus: #E0835F;
+  }
 
-  fieldset{border:1px solid var(--line);border-radius:12px;padding:16px 16px 6px;margin:0 0 16px;background:var(--paper)}
-  legend{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);padding:0 8px;font-weight:600}
-  .field{margin-bottom:14px}
-  .field > label{display:block;font-size:13.5px;color:var(--ink);margin-bottom:5px;font-weight:500}
-  .hint{display:block;font-size:12px;color:var(--faint);margin-top:4px;line-height:1.35}
-  input[type=number]{width:100%;font-family:var(--mono);font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px}
-  input[type=number]:focus,input[type=range]:focus-visible,button:focus-visible,select:focus{outline:2px solid var(--proprio);outline-offset:1px}
-  input[disabled]{background:#F1F4F1;color:var(--faint)}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .slider-wrap{display:flex;align-items:center;gap:12px}
-  input[type=range]{flex:1;accent-color:var(--proprio);height:22px}
-  .val-out{font-family:var(--mono);font-size:14px;min-width:104px;text-align:right;color:var(--ink)}
-  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
-  .seg button{border:0;background:#fff;padding:8px 14px;font-family:var(--sans);font-size:13.5px;color:var(--muted);cursor:pointer}
-  .seg button[aria-pressed=true]{background:var(--ink);color:#fff}
-  .check{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--muted);cursor:pointer}
-  .check input{margin-top:2px;accent-color:var(--proprio)}
+  * { box-sizing: border-box; }
 
-  .results{position:sticky;top:18px}
-  @media(max-width:880px){.results{position:static}}
-  .panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
-  .panel h2{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 14px;font-weight:600}
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
 
-  /* HERO — aporte mensal para 1/3 */
-  .hero{background:var(--ink);color:#EAF0EC;border:1px solid var(--ink);border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
-  .hero .cap{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:#9DB4AA}
-  .hero .amount{font-family:var(--serif);font-weight:600;font-size:clamp(40px,8vw,60px);line-height:1;letter-spacing:-.02em;margin:8px 0 2px;color:#fff;font-variant-numeric:tabular-nums}
-  .hero .per{font-size:14px;color:#9DB4AA;margin-bottom:16px}
-  .hero .sub{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid rgba(255,255,255,.14);padding-top:14px}
-  .hero .sub .k{font-size:12px;color:#9DB4AA}
-  .hero .sub .v{font-family:var(--mono);font-size:16px;font-weight:600;color:#fff;margin-top:2px}
-  .hero .status{margin-top:14px;font-size:13.5px;display:flex;align-items:center;gap:9px;color:#DCE7E1}
-  .hero .status .pill{font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:20px}
-  .pill.ok{background:#20563E;color:#8FE3BC} .pill.no{background:#5A2320;color:#F3B4AF}
+  a { color: inherit; }
 
-  .compbar{display:flex;height:28px;border-radius:7px;overflow:hidden;border:1px solid var(--line);background:#f3f5f3}
-  .compbar > i{display:block;height:100%;transition:width .45s cubic-bezier(.2,.7,.2,1)}
-  .seg-f{background:var(--fundo)} .seg-p{background:var(--proprio)} .seg-b{background:var(--banco)}
-  .comp-legend{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
-  .comp-legend .li{border-top:2px solid var(--line);padding-top:8px}
-  .comp-legend .k{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
-  .comp-legend .v{font-family:var(--mono);font-size:15px;font-weight:600;margin-top:2px}
-  .comp-legend .pct{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
-  .li.f{border-top-color:var(--fundo)} .li.p{border-top-color:var(--proprio)} .li.b{border-top-color:var(--banco)}
-  .dot{width:11px;height:11px;border-radius:2px;display:inline-block}
-  .dot.f{background:var(--fundo)} .dot.p{background:var(--proprio)} .dot.b{background:var(--banco)}
+  header.page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.75rem 1.5rem 1.25rem;
+  }
 
-  .stat{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px dotted var(--line)}
-  .stat:last-child{border-bottom:0}
-  .stat .lab{font-size:13.5px;color:var(--muted)}
-  .stat .num{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ink);text-align:right}
-  .stat .num small{font-weight:400;color:var(--faint);font-size:12px}
-  .big{font-size:18px}
+  header.page h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 3vw, 2.15rem);
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.01em;
+  }
 
-  .gauge{height:26px;border-radius:6px;background:var(--line);position:relative;overflow:hidden;margin:6px 0 4px}
-  .gauge > i{display:block;height:100%;transition:width .4s ease;background:var(--fundo)}
-  .gauge.over > i{background:var(--danger)}
-  .verdict{font-size:13.5px;font-weight:600;margin-top:8px;display:flex;align-items:center;gap:8px}
-  .verdict.ok{color:var(--fundo)} .verdict.no{color:var(--danger)}
-  .pill2{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:20px}
-  .pill2.ok{background:var(--fundo-bg);color:var(--fundo)} .pill2.no{background:var(--danger-bg);color:var(--danger)}
+  header.page p {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+  }
 
-  .callout{background:var(--fundo-bg);border-left:3px solid var(--fundo);border-radius:0 8px 8px 0;padding:11px 14px;font-size:13px;color:#16382a;margin-top:12px}
-  .callout.warn{background:var(--banco-bg);border-left-color:var(--banco);color:#5a2f10}
+  main.layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+    gap: 1.75rem;
+    align-items: start;
+  }
 
-  details{border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:2px 16px;margin:10px 0 26px}
-  summary{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 0;font-weight:600}
-  details[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
-  .notes p{font-size:13px;color:var(--muted);margin:.5rem 0}
-  .notes strong{color:var(--ink)}
-  footer{border-top:1px solid var(--line);margin-top:8px;padding-top:16px;font-size:12px;color:var(--faint);max-width:78ch}
-  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+  @media (max-width: 880px) {
+    main.layout { grid-template-columns: 1fr; }
+    aside.result { order: -1; position: static; }
+  }
+
+  fieldset {
+    border: none;
+    margin: 0 0 1.75rem;
+    padding: 0;
+  }
+
+  fieldset legend {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 0 0 0.6rem;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .field-row.pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .field-row.pair { grid-template-columns: 1fr; }
+  }
+
+  label {
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+  }
+
+  .hint {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 0.15rem;
+  }
+
+  .currency-wrap, .unit-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--bg-field);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .currency-wrap span, .unit-wrap span {
+    padding: 0 0.65rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    border-right: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .unit-wrap span {
+    border-right: none;
+    border-left: 1px solid var(--border);
+    order: 2;
+  }
+
+  input[type="number"], input[type="month"], select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0.55rem 0.7rem;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    color: var(--ink);
+    min-width: 0;
+  }
+
+  input[type="number"]:focus, input[type="month"]:focus, select:focus {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .checkbox-row input { width: auto; }
+
+  .checkbox-row label { color: var(--ink); font-size: 0.9rem; }
+
+  .radio-group {
+    display: flex;
+    gap: 1.25rem;
+    background: var(--bg-field);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.55rem 0.8rem;
+  }
+
+  .date-pair {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .date-pair select {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-field);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.55rem 0.6rem;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .date-pair select:focus {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--ink);
+    font-size: 0.9rem;
+  }
+
+  aside.result {
+    position: sticky;
+    top: 1.5rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+
+  .stack-label {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.5rem;
+  }
+
+  .stack-bar {
+    display: flex;
+    width: 100%;
+    height: 34px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 0.85rem;
+  }
+
+  .stack-bar > div {
+    height: 100%;
+    transition: width 0.35s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stack-bar > div { transition: none; }
+  }
+
+  .seg-proprios { background: var(--positive); }
+  .seg-fundalemg { background: var(--accent); }
+  .seg-banco { background: var(--bank); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-bottom: 1.5rem;
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .legend i {
+    width: 9px; height: 9px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  .hero {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero .label {
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.2rem;
+  }
+
+  .hero .value {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+
+  .hero .value.zero { color: var(--positive); }
+
+  .note-box {
+    font-size: 0.82rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 3px;
+    margin-bottom: 1.35rem;
+    background: var(--warn-tint);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+
+  .note-box.ok { background: var(--positive-tint); }
+
+  dl.detail {
+    margin: 0 0 1.5rem;
+    font-size: 0.88rem;
+  }
+
+  dl.detail > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  dl.detail > div:last-child { border-bottom: none; }
+
+  dl.detail dt { color: var(--ink-soft); }
+  dl.detail dd { margin: 0; font-weight: 500; text-align: right; white-space: nowrap; }
+
+  h3.section-title {
+    font-family: var(--serif);
+    font-size: 0.98rem;
+    font-weight: 600;
+    margin: 0 0 0.7rem;
+  }
+
+  .margem-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .margem-status {
+    font-size: 0.82rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .margem-status.ok { background: var(--positive-tint); color: var(--positive); }
+  .margem-status.estourou { background: var(--warn-tint); color: var(--warn); }
+
+  footer.page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    max-width: 78ch;
+  }
+
+  footer.page p { margin: 0 0 0.6rem; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="top">
-    <div class="eyebrow">Planejamento · compra do apartamento</div>
-    <h1>Quanto guardar por mês para juntar a entrada</h1>
-    <p class="lede">O número central é o aporte mensal que leva seus recursos próprios a 1/3 do preço do imóvel na data da compra. Abaixo, como o restante se resolve: o auxílio do Fundalemg cobre o grosso, e o banco entra só no que sobrar.</p>
-  </header>
+<header class="page">
+  <h1>Composição da compra do imóvel</h1>
+  <p>Ajuste os campos abaixo para ver, na hora, o quanto sobra para o banco depois de somar seus recursos próprios ao auxílio habitacional do Fundalemg.</p>
+</header>
 
-  <div class="grid">
+<main class="layout">
+  <section aria-label="Parâmetros">
 
-    <!-- ============ INPUTS ============ -->
-    <form id="inputs" autocomplete="off">
+    <fieldset>
+      <legend>Imóvel e datas</legend>
 
-      <fieldset>
-        <legend>Imóvel e prazo</legend>
-        <div class="field">
-          <label for="preco">Preço do imóvel</label>
-          <div class="slider-wrap">
-            <input type="range" id="precoR" min="400000" max="1200000" step="10000" value="700000" aria-label="Preço do imóvel">
-            <span class="val-out" id="precoOut"></span>
-          </div>
-          <input type="number" id="preco" value="700000" step="10000" style="margin-top:8px">
-          <span class="hint">Sua faixa de busca é R$ 600 mil a R$ 900 mil.</span>
+      <div class="field-row">
+        <label for="mesInicioMes">Mês de início da simulação</label>
+        <div class="date-pair">
+          <select id="mesInicioMes" aria-label="Mês de início">
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09" selected>Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+          <select id="mesInicioAno" aria-label="Ano de início">
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+          </select>
         </div>
-        <div class="field">
-          <label for="prazoCompraR">Meses até a compra</label>
-          <div class="slider-wrap">
-            <input type="range" id="prazoCompraR" min="6" max="36" step="1" value="20" aria-label="Meses até a compra">
-            <span class="val-out" id="prazoCompraOut"></span>
-          </div>
-          <span class="hint">Sua janela é de 15 a 28 meses. O Fundalemg só destrava ao fim do estágio probatório — confirme a data.</span>
-        </div>
-        <div class="field">
-          <label for="meta">Meta de entrada própria (% do preço)</label>
-          <input type="number" id="meta" value="33.33" step="0.01">
-          <span class="hint">33,33% = 1/3 do imóvel, o alvo da sua entrada própria.</span>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Recursos próprios</legend>
-        <div class="field">
-          <label for="propriosHoje">Recursos próprios hoje (inclui a esposa)</label>
-          <input type="number" id="propriosHoje" value="300000" step="5000">
-          <span class="hint">Carteira carimbada para o apê. Sua reserva de emergência fica de fora disto.</span>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="aporte">Aporte mensal atual</label>
-            <input type="number" id="aporte" value="3000" step="100">
-          </div>
-          <div class="field">
-            <label for="rentab">Rendimento líquido (% a.a.)</label>
-            <input type="number" id="rentab" value="11.5" step="0.1">
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Auxílio Fundalemg</legend>
-        <div class="field">
-          <label for="auxilioR">Valor do auxílio a tomar (concedido)</label>
-          <div class="slider-wrap">
-            <input type="range" id="auxilioR" min="0" max="382760" step="1000" value="382760" aria-label="Valor do auxílio">
-            <span class="val-out" id="auxilioOut"></span>
-          </div>
-          <label class="check" style="margin-top:9px"><input type="checkbox" id="maximizar" checked>Maximizar o fundo (usar o máximo que o teto e o preço permitem)</label>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="teto">Teto do auxílio (R$)</label>
-            <input type="number" id="teto" value="382760" step="1000">
-          </div>
-          <div class="field">
-            <label for="prazoFundo">Amortização (meses, máx 120)</label>
-            <input type="number" id="prazoFundo" value="120" step="1" max="120" min="1">
-          </div>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="juros">Juros compensatórios (%)</label>
-            <input type="number" id="juros" value="8" step="0.5">
-          </div>
-          <div class="field">
-            <label for="reaj">Reajuste anual do saldo (% a.a.)</label>
-            <input type="number" id="reaj" value="4" step="0.5">
-          </div>
-        </div>
-        <div class="field">
-          <label class="check"><input type="checkbox" id="descLib" checked>8% descontado na liberação — você recebe 92% do valor concedido</label>
-          <span class="hint">A redação da Deliberação sugere isto, mas confirme a mecânica na DRH. O saldo é corrigido pela tabela de vencimentos da ALMG (campo acima).</span>
-        </div>
-        <div class="field">
-          <label for="seguro">Prêmio de seguro (R$/mês, opcional)</label>
-          <input type="number" id="seguro" value="0" step="10">
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Banco (SBPE) — só o resíduo</legend>
-        <div class="row2">
-          <div class="field">
-            <label for="taxaBanco">Taxa efetiva (% a.a., c/ TR)</label>
-            <input type="number" id="taxaBanco" value="11.5" step="0.1">
-          </div>
-          <div class="field">
-            <label for="prazoBanco">Prazo (meses)</label>
-            <input type="number" id="prazoBanco" value="360" step="12">
-          </div>
-        </div>
-        <div class="field">
-          <label>Sistema de amortização</label>
-          <div class="seg" role="group" aria-label="Sistema de amortização">
-            <button type="button" id="btnSAC" aria-pressed="true">SAC</button>
-            <button type="button" id="btnPrice" aria-pressed="false">Price</button>
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Margem consignável</legend>
-        <div class="field">
-          <label for="liquida">Remuneração líquida (R$/mês)</label>
-          <input type="number" id="liquida" value="15500" step="500">
-          <span class="hint">Após descontos obrigatórios (previdência, IR). Está no seu contracheque.</span>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="percMargem">Margem p/ financiamento (%)</label>
-            <input type="number" id="percMargem" value="30" step="1">
-          </div>
-          <div class="field">
-            <label for="consignados">Consignados já ativos (R$/mês)</label>
-            <input type="number" id="consignados" value="0" step="100">
-          </div>
-        </div>
-        <span class="hint">Referência estadual (Lei 19.490/2011): até 30% da líquida. Confirme a norma da ALMG.</span>
-      </fieldset>
-
-    </form>
-
-    <!-- ============ RESULTS ============ -->
-    <div class="results">
-
-      <!-- HERO: aporte mensal para 1/3 -->
-      <div class="hero">
-        <div class="cap" id="heroCap">Aporte mensal para juntar 1/3 do imóvel</div>
-        <div class="amount" id="aporteHero">—</div>
-        <div class="per">por mês, até a data da compra</div>
-        <div class="sub">
-          <div><div class="k">Meta (entrada própria)</div><div class="v" id="alvoV">—</div></div>
-          <div><div class="k">Projeção dos próprios na data</div><div class="v" id="projV">—</div></div>
-        </div>
-        <div class="status" id="heroStatus"></div>
       </div>
 
-      <div class="panel">
-        <h2>Como o restante do preço se resolve</h2>
-        <div class="compbar" id="compbar" aria-hidden="true">
-          <i class="seg-f" id="barF"></i><i class="seg-p" id="barP"></i><i class="seg-b" id="barB"></i>
+      <div class="field-row">
+        <label for="valorImovel">Valor do imóvel</label>
+        <div class="currency-wrap"><span>R$</span><input type="text" inputmode="decimal" class="money" id="valorImovel" value="850.000"></div>
+      </div>
+
+      <div class="field-row">
+        <label for="dataAlvoMes">Data-alvo da compra</label>
+        <div class="date-pair">
+          <select id="dataAlvoMes" aria-label="Mês da compra">
+            <option value="01" selected>Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+          <select id="dataAlvoAno" aria-label="Ano da compra">
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028" selected>2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+            <option value="2031">2031</option>
+            <option value="2032">2032</option>
+            <option value="2033">2033</option>
+            <option value="2034">2034</option>
+            <option value="2035">2035</option>
+          </select>
         </div>
-        <div class="comp-legend">
-          <div class="li f"><div class="k"><i class="dot f"></i>Fundo</div><div class="v" id="vFundo"></div><div class="pct" id="pFundo"></div></div>
-          <div class="li p"><div class="k"><i class="dot p"></i>Próprios</div><div class="v" id="vProprio"></div><div class="pct" id="pProprio"></div></div>
-          <div class="li b"><div class="k"><i class="dot b"></i>Banco</div><div class="v" id="vBanco"></div><div class="pct" id="pBanco"></div></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Recursos próprios</legend>
+
+      <div class="field-row">
+        <label for="recursosHoje">Recursos acumulados hoje</label>
+        <div class="currency-wrap"><span>R$</span><input type="text" inputmode="decimal" class="money" id="recursosHoje" value="180.000"></div>
+      </div>
+
+      <div class="field-row pair">
+        <div>
+          <label for="aporteMensal">Aporte mensal</label>
+          <div class="currency-wrap"><span>R$</span><input type="text" inputmode="decimal" class="money" id="aporteMensal" value="2.000"></div>
         </div>
-        <div id="calloutBanco"></div>
+        <div>
+          <label for="rendimentoMensal">Rendimento mensal da reserva</label>
+          <div class="unit-wrap"><input type="number" id="rendimentoMensal" value="0" min="0" max="5" step="0.1"><span>%</span></div>
+        </div>
+      </div>
+      <p class="hint">Deixe o rendimento em 0% para uma estimativa conservadora, ou ajuste para simular a reserva rendendo enquanto você acumula.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fundalemg — auxílio habitacional</legend>
+
+      <div class="field-row pair">
+        <div>
+          <label for="tetoFundalemg">Teto atual do auxílio</label>
+          <div class="currency-wrap"><span>R$</span><input type="text" inputmode="decimal" class="money" id="tetoFundalemg" value="382.760"></div>
+        </div>
+        <div>
+          <label for="reajusteTeto">Reajuste anual estimado do teto</label>
+          <div class="unit-wrap"><input type="number" id="reajusteTeto" value="0" min="0" max="20" step="0.5"><span>%</span></div>
+        </div>
+      </div>
+      <p class="hint">O teto é corrigido pela tabela de vencimentos da ALMG (art. 22, §1º, da Deliberação 2.867/2025) — projete um reajuste médio se quiser um cenário menos conservador.</p>
+
+      <div class="field-row pair">
+        <div>
+          <label for="descontoFundalemg">Desconto na liberação (juros compensatórios)</label>
+          <div class="unit-wrap"><input type="number" id="descontoFundalemg" value="8" min="0" max="30" step="0.5"><span>%</span></div>
+        </div>
+        <div>
+          <label for="dataDisponivelMes">Fundalemg disponível a partir de</label>
+          <div class="date-pair">
+            <select id="dataDisponivelMes" aria-label="Mês de disponibilidade">
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08" selected>Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+            <select id="dataDisponivelAno" aria-label="Ano de disponibilidade">
+              <option value="2026">2026</option>
+              <option value="2027" selected>2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+              <option value="2030">2030</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <div class="panel">
-        <h2>Parcelas mensais depois da compra</h2>
-        <div class="stat"><span class="lab">Fundalemg — 1ª parcela <small id="fundoSeg"></small></span><span class="num" id="parcelaFundo"></span></div>
-        <div class="stat"><span class="lab">Fundalemg — parcela máx. (c/ reajuste)</span><span class="num" id="parcelaFundoMax"></span></div>
-        <div class="stat"><span class="lab" id="labBanco">Banco — parcela</span><span class="num" id="parcelaBanco"></span></div>
-        <div class="stat"><span class="lab">Soma no 1º mês</span><span class="num big" id="somaMes"></span></div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="usarMaximo" checked>
+        <label for="usarMaximo">Solicitar o valor máximo permitido</label>
       </div>
 
-      <div class="panel">
-        <h2>Margem consignável — a parcela do fundo cabe?</h2>
-        <div class="gauge" id="gauge"><i id="gaugeFill"></i></div>
-        <div class="stat"><span class="lab">Parcela do fundo (+ seguro)</span><span class="num" id="mgParcela"></span></div>
-        <div class="stat"><span class="lab">Margem disponível</span><span class="num" id="mgDisp"></span></div>
-        <div class="verdict" id="mgVerdict"></div>
+      <div class="field-row" id="valorCustomWrap" style="display:none;">
+        <label for="valorCustom">Valor a solicitar ao Fundalemg</label>
+        <div class="currency-wrap"><span>R$</span><input type="text" inputmode="decimal" class="money" id="valorCustom" value="382.760"></div>
       </div>
 
-      <div class="panel">
-        <h2>Outra referência de aporte</h2>
-        <div class="stat"><span class="lab">Aporte p/ zerar o banco (não financiar nada)</span><span class="num big" id="aporteZerar"></span></div>
-        <div class="stat"><span class="lab">Economia por usar o fundo vs. banco</span><span class="num" id="economia"></span></div>
-        <div id="calloutAporte"></div>
+      <div class="field-row">
+        <label for="premioSeguro">Prêmio mensal estimado do seguro obrigatório</label>
+        <div class="currency-wrap"><span>R$</span><input type="text" inputmode="decimal" class="money" id="premioSeguro" value="0"></div>
+      </div>
+      <p class="hint">Depende da apólice contratada pela ALMG (art. 31) — ajuste quando tiver o valor exato; ele soma à parcela para efeito de margem consignável.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Financiamento bancário complementar</legend>
+
+      <div class="field-row pair">
+        <div>
+          <label for="taxaBanco">Taxa de juros efetiva anual</label>
+          <div class="unit-wrap"><input type="number" id="taxaBanco" value="11.5" min="0" max="30" step="0.1"><span>% a.a.</span></div>
+        </div>
+        <div>
+          <label for="prazoBanco">Prazo do financiamento</label>
+          <div class="unit-wrap"><input type="number" id="prazoBanco" value="30" min="1" max="35" step="1"><span>anos</span></div>
+        </div>
       </div>
 
+      <div class="field-row">
+        <label>Sistema de amortização</label>
+        <div class="radio-group">
+          <label><input type="radio" name="sistema" value="SAC" checked> SAC (parcelas decrescentes)</label>
+          <label><input type="radio" name="sistema" value="PRICE"> Price (parcelas fixas)</label>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Sua margem consignável</legend>
+
+      <div class="field-row">
+        <label for="margemConsignavel">Margem consignável mensal disponível</label>
+        <div class="currency-wrap"><span>R$</span><input type="text" inputmode="decimal" class="money" id="margemConsignavel" value="6.245,28"></div>
+      </div>
+      <p class="hint">40% da remuneração líquida, conforme art. 4º da Deliberação da Mesa nº 2.325/2002 (redação da Deliberação nº 2.888/2026) — ajuste se já tiver outras consignações facultativas em folha.</p>
+    </fieldset>
+
+  </section>
+
+  <aside class="result" aria-label="Resultado">
+
+    <div class="stack-label">Composição do valor do imóvel</div>
+    <div class="stack-bar" role="img" aria-label="Barra mostrando a composição entre recursos próprios, Fundalemg e banco">
+      <div class="seg-proprios" id="segProprios"></div>
+      <div class="seg-fundalemg" id="segFundalemg"></div>
+      <div class="seg-banco" id="segBanco"></div>
     </div>
-  </div>
+    <div class="legend">
+      <span><i style="background:var(--positive)"></i>Recursos próprios</span>
+      <span><i style="background:var(--accent)"></i>Fundalemg líquido</span>
+      <span><i style="background:var(--bank)"></i>Banco</span>
+    </div>
 
-  <details class="notes">
-    <summary>Premissas e pontos a confirmar</summary>
-    <p><strong>O número central.</strong> É o aporte mensal que faz seus recursos próprios (valor de hoje + aportes, rendendo à taxa informada) atingirem a meta de entrada — 1/3 do preço por padrão — na data da compra.</p>
-    <p><strong>Ordem de uso do capital.</strong> No painel de composição, o simulador empilha do mais barato ao mais caro: esgota o Fundalemg (até o teto ou o preço), aplica os recursos próprios e joga o restante no banco.</p>
-    <p><strong>Os 8% do Fundalemg.</strong> Encargo único sobre o valor concedido, descontado na liberação — não uma taxa ao ano. Assumindo o desconto na liberação, você recebe 92% do concedido e amortiza 100% em até 120 meses. Confirme a mecânica exata na DRH.</p>
-    <p><strong>Correção do saldo.</strong> Pela tabela de vencimentos da ALMG, não por TR/IPCA/CDI. O "reajuste anual" é estimativa sua.</p>
-    <p><strong>Margem e elegibilidade.</strong> Percentual de referência da Lei estadual 19.490/2011 (confirme a norma da ALMG); auxílio vedado em estágio probatório; aquisição exige não ser proprietário; imóvel na RMBH/Colar; saída da ALMG antecipa o vencimento.</p>
-  </details>
+    <div id="alertaDisponibilidade" class="note-box" style="display:none;"></div>
+    <div id="alertaSobra" class="note-box ok" style="display:none;"></div>
 
-  <footer>
-    Ferramenta de planejamento pessoal — não é recomendação de investimento nem parecer jurídico. Confirme as premissas nas fontes oficiais (Deliberação da Mesa nº 2.867/2025, DRH/Câmara de Apoio Habitacional da ALMG e sua corretora/banco) antes de decidir.
-  </footer>
+    <div class="hero" aria-live="polite">
+      <div class="label" id="heroLabel">Residual a buscar no banco</div>
+      <div class="value" id="heroValue">R$ 0</div>
+    </div>
 
-</div>
+    <dl class="detail">
+      <div><dt>Recursos próprios projetados (na data-alvo)</dt><dd id="outRecursos">—</dd></div>
+      <div><dt>Fundalemg solicitado (valor bruto)</dt><dd id="outFundalemgBruto">—</dd></div>
+      <div><dt>Desconto retido na liberação</dt><dd id="outDesconto">—</dd></div>
+      <div><dt>Fundalemg líquido disponível</dt><dd id="outFundalemgLiquido">—</dd></div>
+      <div><dt>Total disponível na data-alvo</dt><dd id="outTotal">—</dd></div>
+    </dl>
+
+    <h3 class="section-title">Parcelas estimadas (1º mês)</h3>
+    <dl class="detail">
+      <div><dt>Fundalemg (120 meses, art. 24)</dt><dd id="outParcelaFundalemg">—</dd></div>
+      <div><dt>Banco (<span id="outSistemaLabel">SAC</span>)</dt><dd id="outParcelaBanco">—</dd></div>
+      <div><dt>Soma das duas parcelas</dt><dd id="outSomaParcelas">—</dd></div>
+    </dl>
+
+    <h3 class="section-title">Margem consignável</h3>
+    <div class="margem-row">
+      <span>Parcela Fundalemg + seguro</span>
+      <span class="margem-status" id="margemStatus">—</span>
+    </div>
+    <div class="hint" id="margemDetalhe"></div>
+
+  </aside>
+</main>
+
+<footer class="page">
+  <p>Estimativa educacional para planejamento pessoal, com base na Deliberação da Mesa nº 2.867/2025 (Fundalemg) e na Deliberação da Mesa nº 2.325/2002, com a redação da Deliberação nº 2.888/2026 (margem consignável na ALMG). Não substitui simulação oficial da Câmara de Apoio Habitacional nem do banco financiador — taxas, prazos e o valor do seguro variam conforme a instituição e a apólice.</p>
+</footer>
 
 <script>
-(function(){
-  const $ = id => document.getElementById(id);
-  const BRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
-  const num = v => { const n = parseFloat(v); return isFinite(n)?n:0; };
-  let sistema='SAC';
+(function () {
+  const $ = (id) => document.getElementById(id);
 
-  function fundoSchedule(concedido, prazo, reajAnual, seguro){
-    prazo=Math.max(1,Math.round(prazo));
-    let saldo=concedido,restante=prazo,amort=saldo/restante,first=0,max=0,total=0;const rA=reajAnual/100;
-    for(let m=1;m<=prazo;m++){
-      if(m>1 && (m-1)%12===0){ saldo*=(1+rA); restante=prazo-(m-1); amort=saldo/restante; }
-      const parcela=amort+seguro; if(m===1)first=parcela; if(parcela>max)max=parcela; total+=parcela; saldo-=amort;
+  const fields = [
+    'rendimentoMensal',
+    'reajusteTeto','descontoFundalemg','usarMaximo',
+    'taxaBanco','prazoBanco'
+  ];
+
+  fields.forEach((id) => {
+    const el = $(id);
+    if (el) el.addEventListener('input', recalcular);
+  });
+  document.querySelectorAll('input[name="sistema"]').forEach((el) => el.addEventListener('change', recalcular));
+  ['dataAlvoMes','dataAlvoAno','mesInicioMes','mesInicioAno','dataDisponivelMes','dataDisponivelAno']
+    .forEach((id) => $(id).addEventListener('change', recalcular));
+
+  $('usarMaximo').addEventListener('change', function () {
+    $('valorCustomWrap').style.display = this.checked ? 'none' : 'block';
+    recalcular();
+  });
+
+  const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 });
+  const fmt = (v) => brl.format(isFinite(v) ? v : 0);
+
+  function formatMoneyString(raw) {
+    let s = raw.replace(/[^\d,]/g, '');
+    const firstComma = s.indexOf(',');
+    if (firstComma !== -1) {
+      s = s.slice(0, firstComma + 1) + s.slice(firstComma + 1).replace(/,/g, '');
     }
-    return {first,max,total};
+    let [intPart, decPart] = s.split(',');
+    intPart = (intPart || '').replace(/^0+(?=\d)/, '');
+    intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return decPart !== undefined ? intPart + ',' + decPart.slice(0, 2) : intPart;
   }
-  function bancoCalc(valor, taxaAnual, prazo, sist){
-    prazo=Math.max(1,Math.round(prazo)); const i=Math.pow(1+taxaAnual/100,1/12)-1;
-    if(valor<=0) return {parcela1:0,parcelaN:0,total:0,price:0};
-    if(sist==='Price'){ const p=i>0?valor*i/(1-Math.pow(1+i,-prazo)):valor/prazo; return {parcela1:p,parcelaN:p,total:p*prazo,price:p}; }
-    const amort=valor/prazo; let saldo=valor,total=0,p1=0,pN=0;
-    for(let m=1;m<=prazo;m++){ const juros=saldo*i; const parc=amort+juros; if(m===1)p1=parc; if(m===prazo)pN=parc; total+=parc; saldo-=amort; }
-    return {parcela1:p1,parcelaN:pN,total,price:0};
+
+  function parseMoneyString(str) {
+    if (!str) return 0;
+    const v = parseFloat(String(str).replace(/\./g, '').replace(',', '.'));
+    return isFinite(v) ? v : 0;
   }
-  function futureValue(pv,pmt,r,n){ n=Math.max(0,Math.round(n)); if(r===0)return pv+pmt*n; const g=Math.pow(1+r,n); return pv*g+pmt*(g-1)/r; }
-  function pmtNeeded(target,pv,r,n){ n=Math.max(1,Math.round(n)); const g=Math.pow(1+r,n); const grown=pv*g; if(grown>=target)return 0; if(r===0)return (target-pv)/n; return (target-grown)/((g-1)/r); }
 
-  $('btnSAC').addEventListener('click',()=>{sistema='SAC';$('btnSAC').setAttribute('aria-pressed','true');$('btnPrice').setAttribute('aria-pressed','false');calc();});
-  $('btnPrice').addEventListener('click',()=>{sistema='Price';$('btnPrice').setAttribute('aria-pressed','true');$('btnSAC').setAttribute('aria-pressed','false');calc();});
-  $('inputs').addEventListener('input',calc);
+  function getMoney(id) {
+    return parseMoneyString($(id).value);
+  }
 
-  // preco range <-> number
-  $('precoR').addEventListener('input',()=>{$('preco').value=$('precoR').value;$('precoOut').textContent=BRL.format(+$('precoR').value);calc();});
-  $('preco').addEventListener('input',()=>{let v=+$('preco').value;const r=$('precoR');if(v>=+r.min&&v<=+r.max){r.value=v;}$('precoOut').textContent=BRL.format(v);calc();});
-  $('prazoCompraR').addEventListener('input',()=>{$('prazoCompraOut').textContent=$('prazoCompraR').value+' meses';calc();});
-  $('auxilioR').addEventListener('input',calc);
+  document.querySelectorAll('input.money').forEach((el) => {
+    el.addEventListener('input', function () {
+      const fromEnd = this.value.length - this.selectionStart;
+      this.value = formatMoneyString(this.value);
+      const pos = Math.max(0, this.value.length - fromEnd);
+      this.setSelectionRange(pos, pos);
+      recalcular();
+    });
+  });
 
-  function calc(){
-    const preco=num($('preco').value);
-    const prazoCompra=num($('prazoCompraR').value);
-    const meta=num($('meta').value);
-    const teto=num($('teto').value);
-    const auxMax=Math.max(0,Math.min(teto,preco));
-    const auxR=$('auxilioR'); auxR.max=auxMax||0;
-    if($('maximizar').checked){ auxR.value=auxMax; auxR.disabled=true; }
-    else { auxR.disabled=false; if(+auxR.value>auxMax)auxR.value=auxMax; }
-    const concedido=Math.min(num(auxR.value),auxMax);
-    $('auxilioOut').textContent=BRL.format(concedido);
+  function mesesEntre(inicioStr, fimStr) {
+    if (!inicioStr || !fimStr) return 0;
+    const [ai, mi] = inicioStr.split('-').map(Number);
+    const [af, mf] = fimStr.split('-').map(Number);
+    return Math.max(0, (af - ai) * 12 + (mf - mi));
+  }
 
-    const juros=num($('juros').value), descLib=$('descLib').checked;
-    const prazoFundo=Math.min(120,Math.max(1,num($('prazoFundo').value)));
-    const reaj=num($('reaj').value), seguro=num($('seguro').value);
-    const propriosHoje=num($('propriosHoje').value), aporte=num($('aporte').value), rentab=num($('rentab').value);
-    const rM=Math.pow(1+rentab/100,1/12)-1;
-    const taxaBanco=num($('taxaBanco').value), prazoBanco=num($('prazoBanco').value);
-    const liquida=num($('liquida').value), percMargem=num($('percMargem').value), consignados=num($('consignados').value);
+  function valorFuturoAporte(pv, aporteMensal, iMensalPct, n) {
+    const i = iMensalPct / 100;
+    if (n <= 0) return pv;
+    if (i === 0) return pv + aporteMensal * n;
+    return pv * Math.pow(1 + i, n) + aporteMensal * ((Math.pow(1 + i, n) - 1) / i);
+  }
 
-    // ---- HERO: aporte para a meta (1/3) ----
-    const alvo=preco*(meta/100);
-    const propriosNaData=futureValue(propriosHoje,aporte,rM,prazoCompra);
-    const aporteMeta=pmtNeeded(alvo,propriosHoje,rM,prazoCompra);
-    $('aporteHero').textContent=BRL.format(aporteMeta);
-    $('alvoV').textContent=BRL.format(alvo);
-    $('projV').textContent=BRL.format(propriosNaData);
-    const hs=$('heroStatus');
-    if(aporteMeta<=0){
-      hs.innerHTML='<span class="pill ok">meta já alcançada</span> Sem aporte, seus recursos já chegam ao alvo na data.';
-    } else if(aporteMeta<=aporte){
-      hs.innerHTML='<span class="pill ok">no ritmo</span> Seu aporte atual de '+BRL.format(aporte)+' já supera o necessário.';
+  function parcelaPrice(principal, iAnualPct, n) {
+    const iAnual = iAnualPct / 100;
+    const iMensal = Math.pow(1 + iAnual, 1 / 12) - 1;
+    if (n <= 0) return 0;
+    if (iMensal === 0) return principal / n;
+    return principal * (iMensal * Math.pow(1 + iMensal, n)) / (Math.pow(1 + iMensal, n) - 1);
+  }
+
+  function parcelaSacPrimeira(principal, iAnualPct, n) {
+    const iAnual = iAnualPct / 100;
+    const iMensal = Math.pow(1 + iAnual, 1 / 12) - 1;
+    if (n <= 0) return 0;
+    const amort = principal / n;
+    const juros = principal * iMensal;
+    return amort + juros;
+  }
+
+  function recalcular() {
+    const mesInicio = $('mesInicioAno').value + '-' + $('mesInicioMes').value;
+    const dataAlvo = $('dataAlvoAno').value + '-' + $('dataAlvoMes').value;
+    const dataDisponivel = $('dataDisponivelAno').value + '-' + $('dataDisponivelMes').value;
+
+    const valorImovel = getMoney('valorImovel');
+    const recursosHoje = getMoney('recursosHoje');
+    const aporteMensal = getMoney('aporteMensal');
+    const rendimentoMensal = parseFloat($('rendimentoMensal').value) || 0;
+
+    const tetoFundalemg = getMoney('tetoFundalemg');
+    const reajusteTeto = parseFloat($('reajusteTeto').value) || 0;
+    const descontoPct = parseFloat($('descontoFundalemg').value) || 0;
+    const premioSeguro = getMoney('premioSeguro');
+    const usarMaximo = $('usarMaximo').checked;
+    const valorCustom = getMoney('valorCustom');
+
+    const taxaBanco = parseFloat($('taxaBanco').value) || 0;
+    const prazoBancoAnos = parseFloat($('prazoBanco').value) || 0;
+    const sistema = document.querySelector('input[name="sistema"]:checked').value;
+
+    const margemConsignavel = getMoney('margemConsignavel');
+
+    const n = mesesEntre(mesInicio, dataAlvo);
+    const anos = n / 12;
+
+    // Recursos próprios projetados
+    const recursosProjetados = valorFuturoAporte(recursosHoje, aporteMensal, rendimentoMensal, n);
+
+    // Teto do Fundalemg projetado
+    const tetoProjetado = tetoFundalemg * Math.pow(1 + reajusteTeto / 100, anos);
+
+    // Disponibilidade do Fundalemg na data-alvo
+    const disponivel = mesesEntre(dataDisponivel, dataAlvo) >= 0;
+    const alertaDisp = $('alertaDisponibilidade');
+    let valorSolicitado = 0;
+    if (disponivel) {
+      const maximoPermitido = Math.min(tetoProjetado, valorImovel);
+      valorSolicitado = usarMaximo ? maximoPermitido : Math.min(valorCustom, maximoPermitido);
+      alertaDisp.style.display = 'none';
     } else {
-      hs.innerHTML='<span class="pill no">acima do atual</span> Seu aporte atual é '+BRL.format(aporte)+'. Faltam '+BRL.format(aporteMeta-aporte)+'/mês.';
+      alertaDisp.style.display = 'block';
+      alertaDisp.textContent = 'Na data-alvo escolhida, o Fundalemg ainda não estaria disponível — ajuste a data-alvo ou a data de disponibilidade do fundo.';
     }
 
-    // ---- Composição (fundo -> próprios -> banco) ----
-    const fundoNet=descLib?concedido*(1-juros/100):concedido;
-    const restanteAposFundo=Math.max(0,preco-fundoNet);
-    const propriosAplicados=Math.min(propriosNaData,restanteAposFundo);
-    const banco=Math.max(0,restanteAposFundo-propriosAplicados);
-    const propriosSobra=Math.max(0,propriosNaData-propriosAplicados);
-    const pf=preco>0?fundoNet/preco*100:0, pp=preco>0?propriosAplicados/preco*100:0, pb=preco>0?banco/preco*100:0;
-    $('barF').style.width=pf+'%'; $('barP').style.width=pp+'%'; $('barB').style.width=pb+'%';
-    $('vFundo').textContent=BRL.format(fundoNet); $('pFundo').textContent=pf.toFixed(0)+'% do preço';
-    $('vProprio').textContent=BRL.format(propriosAplicados); $('pProprio').textContent=pp.toFixed(0)+'% do preço';
-    $('vBanco').textContent=BRL.format(banco); $('pBanco').textContent=pb.toFixed(0)+'% do preço';
-    const cb=$('calloutBanco');
-    if(banco<=0){ cb.className='callout'; cb.innerHTML='<strong>Banco zerado.</strong> Fundo + próprios cobrem a compra'+(propriosSobra>500?'. Sobram '+BRL.format(propriosSobra)+', que ficam investidos.':'.'); }
-    else { const ltv=preco>0?banco/preco*100:0; cb.className='callout warn'; cb.innerHTML='<strong>Falta '+BRL.format(banco)+' para o banco</strong> — LTV de '+ltv.toFixed(0)+'%. Quanto menor, melhor a taxa.'; }
+    const fundalemgLiquido = valorSolicitado * (1 - descontoPct / 100);
+    const totalDisponivel = recursosProjetados + fundalemgLiquido;
+    const residuoBanco = Math.max(0, valorImovel - totalDisponivel);
+    const sobra = totalDisponivel - valorImovel;
 
-    // ---- Parcelas ----
-    const fs=fundoSchedule(concedido,prazoFundo,reaj,seguro);
-    $('parcelaFundo').textContent=BRL.format(fs.first);
-    $('parcelaFundoMax').textContent=BRL.format(fs.max);
-    $('fundoSeg').textContent=seguro>0?'(inclui seguro)':'';
-    const bc=bancoCalc(banco,taxaBanco,prazoBanco,sistema);
-    if(banco<=0){ $('labBanco').textContent='Banco — parcela'; $('parcelaBanco').textContent='—'; }
-    else if(sistema==='SAC'){ $('labBanco').textContent='Banco — 1ª → última (SAC)'; $('parcelaBanco').innerHTML=BRL.format(bc.parcela1)+' <small>→ '+BRL.format(bc.parcelaN)+'</small>'; }
-    else { $('labBanco').textContent='Banco — parcela fixa (Price)'; $('parcelaBanco').textContent=BRL.format(bc.price); }
-    $('somaMes').textContent=BRL.format(fs.first+(banco>0?(sistema==='Price'?bc.price:bc.parcela1):0));
+    const alertaSobra = $('alertaSobra');
+    if (sobra > 0) {
+      alertaSobra.style.display = 'block';
+      alertaSobra.textContent = 'Seus recursos e o Fundalemg juntos cobririam mais do que o preço do imóvel — sobra estimada de ' + fmt(sobra) + ', que pode ir para ITBI, escritura e registro (art. 17, §5º) ou ficar de reserva.';
+    } else {
+      alertaSobra.style.display = 'none';
+    }
 
-    // ---- Margem ----
-    const margemDisp=Math.max(0,liquida*(percMargem/100)-consignados);
-    $('mgParcela').textContent=BRL.format(fs.first);
-    $('mgDisp').textContent=BRL.format(margemDisp);
-    const ratio=margemDisp>0?fs.first/margemDisp:(fs.first>0?2:0);
-    const g=$('gauge'); $('gaugeFill').style.width=Math.min(100,ratio*100)+'%';
-    const v=$('mgVerdict');
-    if(fs.first<=margemDisp){ g.classList.remove('over'); v.className='verdict ok'; v.innerHTML='<span class="pill2 ok">cabe</span> Folga de '+BRL.format(margemDisp-fs.first)+'/mês — quem limita é o teto do fundo, não a folha.'; }
-    else { g.classList.add('over'); v.className='verdict no'; v.innerHTML='<span class="pill2 no">estoura</span> Faltam '+BRL.format(fs.first-margemDisp)+'/mês. Reduza o auxílio ou alongue o prazo.'; }
+    // Barra empilhada (soma sempre = valorImovel)
+    const segProprios = Math.min(recursosProjetados, valorImovel);
+    const restante1 = valorImovel - segProprios;
+    const segFundalemg = Math.min(fundalemgLiquido, restante1);
+    const segBanco = Math.max(0, restante1 - segFundalemg);
 
-    // ---- Outra referência: aporte p/ zerar banco + custo ----
-    const aporteZerar=pmtNeeded(restanteAposFundo,propriosHoje,rM,prazoCompra);
-    $('aporteZerar').textContent=BRL.format(aporteZerar);
-    const beq=bancoCalc(concedido,taxaBanco,prazoFundo,sistema);
-    const eco=beq.total-fs.total;
-    $('economia').textContent=(eco>=0?'+ ':'- ')+BRL.format(Math.abs(eco));
-    const ca=$('calloutAporte');
-    ca.className='callout';
-    ca.innerHTML='Aportando os '+BRL.format(aporteMeta)+' da meta você chega a 1/3; para <em>não financiar nada</em> no banco, o aporte seria '+BRL.format(aporteZerar)+'/mês.';
+    const pct = (v) => valorImovel > 0 ? (v / valorImovel * 100) : 0;
+    $('segProprios').style.width = pct(segProprios) + '%';
+    $('segFundalemg').style.width = pct(segFundalemg) + '%';
+    $('segBanco').style.width = pct(segBanco) + '%';
 
-    $('precoOut').textContent=BRL.format(preco);
-    $('prazoCompraOut').textContent=prazoCompra+' meses';
+    // Hero
+    if (residuoBanco <= 0) {
+      $('heroLabel').textContent = 'Nada a buscar no banco';
+      $('heroValue').textContent = 'R$ 0';
+      $('heroValue').classList.add('zero');
+    } else {
+      $('heroLabel').textContent = 'Residual a buscar no banco';
+      $('heroValue').textContent = fmt(residuoBanco);
+      $('heroValue').classList.remove('zero');
+    }
+
+    // Detalhes
+    $('outRecursos').textContent = fmt(recursosProjetados);
+    $('outFundalemgBruto').textContent = fmt(valorSolicitado);
+    $('outDesconto').textContent = '– ' + fmt(valorSolicitado - fundalemgLiquido);
+    $('outFundalemgLiquido').textContent = fmt(fundalemgLiquido);
+    $('outTotal').textContent = fmt(totalDisponivel);
+
+    // Parcelas
+    const parcelaFundalemg = valorSolicitado / 120;
+    const nBanco = prazoBancoAnos * 12;
+    const parcelaBanco = sistema === 'PRICE'
+      ? parcelaPrice(residuoBanco, taxaBanco, nBanco)
+      : parcelaSacPrimeira(residuoBanco, taxaBanco, nBanco);
+
+    $('outSistemaLabel').textContent = sistema === 'PRICE' ? 'Price, fixa' : 'SAC, 1ª parcela';
+    $('outParcelaFundalemg').textContent = fmt(parcelaFundalemg);
+    $('outParcelaBanco').textContent = fmt(parcelaBanco);
+    $('outSomaParcelas').textContent = fmt(parcelaFundalemg + parcelaBanco);
+
+    // Margem consignável (só considera Fundalemg + seguro, que é o que desconta na ALMG)
+    const comprometido = parcelaFundalemg + premioSeguro;
+    const folga = margemConsignavel - comprometido;
+    const statusEl = $('margemStatus');
+    if (comprometido <= margemConsignavel) {
+      statusEl.textContent = 'dentro da margem';
+      statusEl.className = 'margem-status ok';
+      $('margemDetalhe').textContent = 'Folga estimada de ' + fmt(folga) + ' na margem consignável.';
+    } else {
+      statusEl.textContent = 'acima da margem';
+      statusEl.className = 'margem-status estourou';
+      $('margemDetalhe').textContent = 'Déficit estimado de ' + fmt(-folga) + ' — o valor solicitado ao Fundalemg provavelmente precisaria ser reduzido.';
+    }
   }
 
-  calc();
+  recalcular();
 })();
 </script>
+
 </body>
 </html>
